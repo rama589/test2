@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" >
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IbnRoshd</title>
+    <link rel="stylesheet" href="test3.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+</head>
+<body>
+
+    <header class="header">
+<a href="#home"class=logo>ابن <span>رشد</span></a>
+
+<i class='bx bx-menu' id="meun-icon"></i>
+ 
+
+<nav class="navber">
+    <a href="#home"class="active">صفحة الرئسيه</a>
+    <a href="#education">انجازات طلابنا</a>
+    <a href="#servicse">انجازات مدرستنا</a>
+    <a href="#testimolnlas">طاقم العمل</a>
+    <a href="#contact">تواصل معنا</a>
+</nav>
+
+
+    </header>
+
+    <section class="home" id="home">
+        <div class="home-content">
+            <h1><span>   ابن رشد النموذجيه </span></h1>
+            <div class="container">
+                <h2>Where uniqueness <span id="animated-text"></span></h2>
+            </div>
+        
+            <script src="test2.js"></script>
+            <p> شركة تعليمية تقـدم تعليماً متفـرداً يوائم متطلبات العصر، محافظة في بيئتها التعليمية على الهوية الإسلامية بأسلوب تربوي جاذب. منذ أن تأسست الشركة في عـام 2007م وبمنشآت مجهزة بأحدث الوسائل التعليمية والتقنية وبكادر إداري وتعليمـي خبير، حققت الشركة قفزات نوعية واستراتيجية بفضل الله ثم بفضل الرؤية السديدة والمواكبة لكل المستجدات. وها نحن اليوم نتواجـد في العديد مـن مناطق مملكتنا الحبيبة، داعمون لمسيرة التعليم، ومشاركون في التجديد والابتكار لنصبح أيقونة في مسيرة التنمية والعطاء والنماء.</p>
+            <div class="social-icon">
+                <a href="#sn"><i class='bx bxl-linkedin' ></i></a>
+                <a href="#in"><i class='bx bxl-instagram' ></i></a>
+                <a href="#tw"><i class='bx bxl-twitter' ></i></a>
+                <a href="#lin"><i class='bx bxl-snapchat' ></i></a>
+            </div>
+
+            <div class="btn-group">
+                <a href="#" class="btn">هنا</a>
+               <a href="#contact" class="btn">تواصل</a>
+                </div>
+                </div>
+            <div class="home-img">
+
+                <img src="نموذجي تعديل.jpg" alt="">
+            </div>
+
+    </section>
+
+    <section class="education"id="education">
+       <h2 class="heading">انجازات طلابنا </h2>
+    
+    <br> 
+    <div class="process-wrapper">
+    <div id="progress-bar-container">
+        <ul>
+            <li class="step step01 active"><div class="step-inner"> الطالبه</div></li>
+            <li class="step step02"><div class="step-inner">الطالبه</div></li>
+            <li class="step step03"><div class="step-inner"> الطالبه</div></li>
+            <li class="step step03"><div class="step-inner"> الطالبه</div></li>
+                <li class="step step03"><div class="step-inner"> الطالبه</div></li>
+        </ul>
+        
+        <div id="line">
+            <div id="line-progress" style="width: 3%;"></div>
+        </div>
+    </div>
+    
+    <div id="progress-content-section">
+        <div class="section-content discovery active">
+            <h2>طالبه عمل</h2>
+            <p>تميزت الطالبه ب عمالها الرائع</p>
+        </div>
+        
+        <div class="section-content strategy">
+            <h2>عمل الطالبه</h2>
+            <p>تميزت الطالبه ب عمالها الرائع</p>
+        </div>
+        
+        <div class="section-content creative">
+            <h2>عمل الطالبه</h2>
+            <p>تميزت الطالبه</p>
+        </div>
+        
+        <div class="section-content production">
+            <h2>عمل الطالبه</h2>
+            <p>تميزت الطالبه</p>
+        
+        <div class="section-content analysis">
+            <h2>عمل الطالبه</h2>
+            <p>تميزت الطالبه</p>
+        </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+     <script>
+        
+        $(".step").click( function() {
+        $(this).addClass("active").prevAll().addClass("active");
+        $(this).nextAll().removeClass("active");
+    });
+    
+    $(".step01").click( function() {
+        $("#line-progress").css("width", "3%");
+        $(".discovery").addClass("active").siblings().removeClass("active");
+    });
+    
+    $(".step02").click( function() {
+        $("#line-progress").css("width", "25%");
+        $(".strategy").addClass("active").siblings().removeClass("active");
+    });
+    
+    $(".step03").click( function() {
+        $("#line-progress").css("width", "50%");
+        $(".creative").addClass("active").siblings().removeClass("active");
+    });
+    
+    $(".step04").click( function() {
+        $("#line-progress").css("width", "75%");
+        $(".production").addClass("active").siblings().removeClass("active");
+    });
+    
+    $(".step05").click( function() {
+        $("#line-progress").css("width", "100%");
+        $(".analysis").addClass("active").siblings().removeClass("active");
+    });
+    
+     
+        </script>
+
+    <section class="servicse" id="servicse">
+        <h2 class="heading">انجازات مدرستنا</h2>
+        <div class="services-container">
+            <div class="services-box">
+                <div class="services-info">
+                    <h4>هنا تخلد اعظم اعمال مدرستنا</h4>
+                    <p>A cognitive and intellectual process that would stimulate the mind to work continuously. It would also limit the occurrence of various mental illnesses, keep the brain active, and increase its ability to concentrate and analyze.</p>
+                </div>
+            </div>
+
+            <div class="services-box">
+                <div class="services-info">
+                    <h4>هنا تخلد اعظم اعمال مدرستنا</h4>
+                    <p>A cognitive and intellectual process that would stimulate the mind to work continuously. It would also limit the occurrence of various mental illnesses, keep the brain active, and increase its ability to concentrate and analyze.</p>
+                </div>
+            </div>
+
+            <div class="services-box">
+                <div class="services-info">
+                    <h4>هنا تخلد اعظم اعمال مدرستنا</h4>
+                    <p>A cognitive and intellectual process that would stimulate the mind to work continuously. It would also limit the occurrence of various mental illnesses, keep the brain active, and increase its ability to concentrate and analyze.</p>
+                </div>
+            </div>
+
+
+            
+            <div class="services-box">
+                <div class="services-info">
+                    <h4>هنا تخلد اعظم اعمال مدرستنا</h4>
+                    <p>A cognitive and intellectual process that would stimulate the mind to work continuously. It would also limit the occurrence of various mental illnesses, keep the brain active, and increase its ability to concentrate and analyze.</p>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+    
+<section class="testimolnlas" id="testimolnlas">
+    <div class="testimolnlas-box">
+        <h2 class="heading"> طاقم العمل</h2>
+
+        <div class="wrapper">
+            <div class="testimolnlas-item">
+                <img src="افتار2.jpg" alt="">
+                <h2>أ.منال الزهراني</h2>
+                <div class="rating">
+                    <i class='bx bxs-star' id="star"></i>
+                    <i class='bx bxs-star' id="star"></i>
+                    <i class='bx bxs-star' id="star"></i>
+                    <i class='bx bxs-star' id="star"></i>
+                    <i class='bx bxs-star' id="star"></i>
+
+                </div>
+                <p>One of the best teachers in our school</p>
+            </div>
+           
+            <div class="testimolnlas-item">
+                <img src="افتار2.jpg" alt="">
+                <h2>أ.عائشه ال كثيم</h2>
+                <div class="rating">
+                    <i class='bx bxs-star' id="star"></i>
+                    <i class='bx bxs-star' id="star"></i>
+                    <i class='bx bxs-star' id="star"></i>
+                    <i class='bx bxs-star' id="star"></i>
+                    <i class='bx bxs-star' id="star"></i>
+
+                </div>
+                <p>One of the best teachers in our school</p>
+            </div>
+
+            <div class="testimolnlas-item">
+                <img src="افتار2.jpg" alt="">
+                <h2>أ.نوف العريان</h2>
+                <div class="rating">
+                    <i class='bx bxs-star' id="star"></i>
+                    <i class='bx bxs-star' id="star"></i>
+                    <i class='bx bxs-star' id="star"></i>
+                    <i class='bx bxs-star' id="star"></i>
+                    <i class='bx bxs-star' id="star"></i>
+
+                </div>
+                <p>One of the best teachers in our school</p>
+            </div>
+        </div>
+        <div class="testimolnlas-item">
+            <img src="افتار2.jpg" alt="">
+            <h2>أ.أسماء الزهراني</h2>
+            <div class="rating">
+                <i class='bx bxs-star' id="star"></i>
+                <i class='bx bxs-star' id="star"></i>
+                <i class='bx bxs-star' id="star"></i>
+                <i class='bx bxs-star' id="star"></i>
+                <i class='bx bxs-star' id="star"></i>
+
+            </div>
+            <p>One of the best teachers in our school</p>
+        </div>
+    </div>
+    <div class="testimolnlas-item">
+        <img src="افتار2.jpg" alt="">
+        <h2>فاطمة الشمري</h2>
+        <div class="rating">
+            <i class='bx bxs-star' id="star"></i>
+            <i class='bx bxs-star' id="star"></i>
+            <i class='bx bxs-star' id="star"></i>
+            <i class='bx bxs-star' id="star"></i>
+            <i class='bx bxs-star' id="star"></i>
+
+        </div>
+        <p>One of the best teachers in our school</p>
+    </div>
+</div>
+    </div>
+
+</section>
+<section class="contact" id="contact">
+    <h2 class="heading">تواصل <span>معنا</span></h2>
+
+    <form action="">
+        <div class="input-group">
+            <div class="input-box"> 
+                <input type="text" placeholder="Full Name">
+                <input type="email" placeholder="Email">
+            </div>
+            <div class="input-box">
+                <input type="number" placeholder="Phon Number">
+                <input type="text" placeholder="subject">
+            </div>
+        </div>
+
+        <div class="input-group2">
+            <textarea name="" id="" cols="30" rows="10" placeholder="Your Massage"></textarea>
+            <input type="submit" value="Send Massage" class="btn">
+        </div>
+    </form>
+</section>
+
+
+<footer class="footer">
+    <div class="social">
+        <a href="#sn"><i class='bx bxl-linkedin' ></i></a>
+        <a href="#in"><i class='bx bxl-instagram' ></i></a>
+        <a href="#tw"><i class='bx bxl-twitter' ></i></a>
+        <a href="#lin"><i class='bx bxl-snapchat' ></i></a>
+    </div>
+
+    <ul class="list">
+        <li>
+            <a href="#">FAQ</a>
+        </li>
+
+        <li>
+            <a href="#">Services</a>
+        </li>
+
+        <li>
+            <a href="#">Abou Me</a>
+        </li>
+        
+    <li>
+        <a href="#">Contact</a>
+    </li>
+
+    <li>
+        <a href="#">Testimolnlas</a>
+    </li>
+    </ul>
+    <p class="copyringht">
+        © راما الجهني | IbnRoshd
+    </p>
+
+
+</footer>
+
+    <script src="test3.js"></script>
+</body>
+</html>
