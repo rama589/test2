@@ -1,0 +1,48 @@
+/* متغيرات متوافقة مع متجر TechSecure */
+:root {
+    --primary: #4361ee;
+    --primary-light: #4895ef;
+    --dark: #2b2d42;
+    --light: #f8f9fa;
+}
+
+.privacy-page {
+    background-color: var(--light);
+}
+
+.legal-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.privacy-content h2 {
+    color: var(--primary);
+    border-right: 4px solid var(--primary-light);
+    padding-right: 1rem;
+}
+
+.privacy-content ul {
+    list-style-type: none;
+    padding-right: 1.5rem;
+}
+
+.privacy-content li::before {
+    content: "•";
+    color: var(--primary);
+    font-weight: bold;
+    margin-left: 0.5rem;
+}
+
+/* توافق مع الوضع المظلم */
+.dark-mode .legal-container {
+    background: var(--dark);
+    color: var(--light);
+}
+
+.dark-mode .privacy-content h2 {
+    color: var(--primary-light);
+}

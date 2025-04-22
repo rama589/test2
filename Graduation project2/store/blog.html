@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدونة TechSecure | مقالات الأمن السيبراني</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --dark: #2b2d42;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --success: #4cc9f0;
+        }
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .blog-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .blog-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .blog-header h1 {
+            color: var(--primary);
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+        }
+        
+        .blog-header p {
+            color: var(--gray);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .blog-categories {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .category-btn {
+            padding: 10px 25px;
+            background: white;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .category-btn:hover,
+        .category-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .blog-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .blog-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        
+        .blog-image {
+            height: 200px;
+            overflow: hidden;
+        }
+        
+        .blog-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .blog-card:hover .blog-image img {
+            transform: scale(1.1);
+        }
+        
+        .blog-content {
+            padding: 25px;
+        }
+        
+        .blog-meta {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .blog-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .blog-content h3 {
+            color: var(--dark);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            min-height: 70px;
+        }
+        
+        .blog-excerpt {
+            color: var(--gray);
+            margin-bottom: 20px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .blog-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .blog-tag {
+            background: #f1f1f1;
+            color: var(--dark);
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+        
+        .blog-tag:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .read-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .read-more:hover {
+            color: var(--primary-light);
+            gap: 15px;
+        }
+        
+        .newsletter-section {
+            background: var(--primary);
+            color: white;
+            padding: 50px;
+            border-radius: 10px;
+            margin-top: 50px;
+            text-align: center;
+        }
+        
+        .newsletter-section h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        
+        .newsletter-section p {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            font-size: 1.1rem;
+        }
+        
+        .newsletter-form {
+            display: flex;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .newsletter-form input {
+            flex: 1;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 50px 0 0 50px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+        }
+        
+        .newsletter-form input:focus {
+            outline: none;
+        }
+        
+        .newsletter-form button {
+            background: var(--dark);
+            color: white;
+            border: none;
+            padding: 0 30px;
+            border-radius: 0 50px 50px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 500;
+        }
+        
+        .newsletter-form button:hover {
+            background: #1a1a1a;
+        }
+        
+        @media (max-width: 768px) {
+            .blog-container {
+                padding: 30px 15px;
+            }
+            
+            .blog-header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .newsletter-section {
+                padding: 30px 20px;
+            }
+            
+            .newsletter-form {
+                flex-direction: column;
+            }
+            
+            .newsletter-form input,
+            .newsletter-form button {
+                border-radius: 50px;
+                width: 100%;
+            }
+            
+            .newsletter-form button {
+                padding: 15px;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="blog-container">
+        <header class="blog-header">
+            <h1><i class="fas fa-blog"></i> مدونة TechSecure</h1>
+            <p>أحدث المقالات والتحديثات في مجال الأمن السيبراني وتكنولوجيا المعلومات</p>
+        </header>
+        
+        <div class="blog-categories">
+            <button class="category-btn active" data-category="all">الكل</button>
+            <button class="category-btn" data-category="security">أمن المعلومات</button>
+            <button class="category-btn" data-category="hacking">الاختراق الأخلاقي</button>
+            <button class="category-btn" data-category="privacy">الخصوصية</button>
+            <button class="category-btn" data-category="tutorials">شروحات</button>
+        </div>
+        
+        <div class="blog-grid">
+            <!-- المقال 1 -->
+            <div class="blog-card" data-category="security">
+                <div class="blog-image">
+                    <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="أمن المعلومات">
+                </div>
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span><i class="far fa-calendar-alt"></i> 15 أغسطس 2023</span>
+                        <span><i class="far fa-eye"></i> 1.2K مشاهدة</span>
+                    </div>
+                    <h3>أهم 10 تهديدات أمنية يجب أن تعرفها في 2023</h3>
+                    <div class="blog-tags">
+                        <a href="#" class="blog-tag">أمن المعلومات</a>
+                        <a href="#" class="blog-tag">تهديدات</a>
+                    </div>
+                    <p class="blog-excerpt">في هذا المقال نستعرض أهم التهديدات الأمنية التي ظهرت هذا العام وكيفية حماية نفسك منها، مع نصائح عملية من خبراء الأمن السيبراني.</p>
+                    <a href="blog-post-1.html" class="read-more">قراءة المزيد <i class="fas fa-arrow-left"></i></a>
+                </div>
+            </div>
+            
+            <!-- المقال 2 -->
+            <div class="blog-card" data-category="hacking">
+                <div class="blog-image">
+                    <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="الاختراق الأخلاقي">
+                </div>
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span><i class="far fa-calendar-alt"></i> 5 أغسطس 2023</span>
+                        <span><i class="far fa-eye"></i> 890 مشاهدة</span>
+                    </div>
+                    <h3>دليل المبتدئين للاختراق الأخلاقي: من أين تبدأ؟</h3>
+                    <div class="blog-tags">
+                        <a href="#" class="blog-tag">اختراق أخلاقي</a>
+                        <a href="#" class="blog-tag">تعلم</a>
+                    </div>
+                    <p class="blog-excerpt">تعرف على الخطوات الأولى لتصبح مخترقًا أخلاقيًا محترفًا، مع قائمة بأفضل المصادر التعليمية والشهادات المعتمدة في هذا المجال.</p>
+                    <a href="blog-post-2.html" class="read-more">قراءة المزيد <i class="fas fa-arrow-left"></i></a>
+                </div>
+            </div>
+            
+            <!-- المقال 3 -->
+            <div class="blog-card" data-category="privacy">
+                <div class="blog-image">
+                    <img src="https://images.unsplash.com/photo-1585771724684-38269d6639fd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="الخصوصية">
+                </div>
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span><i class="far fa-calendar-alt"></i> 25 يوليو 2023</span>
+                        <span><i class="far fa-eye"></i> 1.5K مشاهدة</span>
+                    </div>
+                    <h3>كيف تحمي خصوصيتك في عصر التتبع الرقمي؟</h3>
+                    <div class="blog-tags">
+                        <a href="#" class="blog-tag">خصوصية</a>
+                        <a href="#" class="blog-tag">حماية</a>
+                    </div>
+                    <p class="blog-excerpt">دليل شامل لحماية خصوصيتك على الإنترنت، يتضمن أدوات وتقنيات تمنع التتبع وتحافظ على بياناتك الشخصية آمنة.</p>
+                    <a href="blog-post-3.html" class="read-more">قراءة المزيد <i class="fas fa-arrow-left"></i></a>
+                </div>
+            </div>
+            
+            <!-- المقال 4 -->
+            <div class="blog-card" data-category="tutorials">
+                <div class="blog-image">
+                    <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1074&q=80" alt="شروحات">
+                </div>
+                <div class="blog-content">
+                    <div class="blog-meta">
+                        <span><i class="far fa-calendar-alt"></i> 10 يوليو 2023</span>
+                        <span><i class="far fa-eye"></i> 2.3K مشاهدة</span>
+                    </div>
+                    <h3>كيفية اكتشاف محاولات التصيد الاحتيالي: دليل عملي</h3>
+                    <div class="blog-tags">
+                        <a href="#" class="blog-tag">تصيد احتيالي</a>
+                        <a href="#" class="blog-tag">أمان</a>
+                    </div>
+                    <p class="blog-excerpt">تعلم كيف تكتشف رسائل التصيد الاحتيالي قبل أن تقع ضحية لها، مع أمثلة حية لأحدث أساليب المخترقين.</p>
+                    <a href="blog-post-4.html" class="read-more">قراءة المزيد <i class="fas fa-arrow-left"></i></a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="newsletter-section">
+            <h2>اشترك في نشرتنا البريدية</h2>
+            <p>احصل على أحدث المقالات والتحديثات الأمنية مباشرة إلى بريدك الإلكتروني</p>
+            <form class="newsletter-form">
+                <input type="email" placeholder="بريدك الإلكتروني" required>
+                <button type="submit">اشترك الآن</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // تصفية المقالات حسب التصنيف
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const category = this.dataset.category;
+                
+                document.querySelectorAll('.blog-card').forEach(card => {
+                    if (category === 'all' || card.dataset.category === category) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+        // إدارة النشرة البريدية
+        document.querySelector('.newsletter-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = this.querySelector('input').value;
+            alert(`شكرًا لك ${email} على الاشتراك! سيصلك آخر مقالاتنا قريبًا.`);
+            this.reset();
+        });
+    </script>
+</body>
+</html>

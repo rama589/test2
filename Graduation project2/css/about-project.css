@@ -1,0 +1,109 @@
+/* about-project.css */
+:root {
+    --primary: #4361ee;
+    --primary-dark: #3a56d4;
+    --dark: #2b2d42;
+    --light: #f8f9fa;
+    --gray: #6c757d;
+}
+
+.about-project-section {
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.about-project-section h3 {
+    color: var(--dark);
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+    padding-right: 15px;
+    border-right: 4px solid var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.about-project-highlight {
+    background-color: rgba(67, 97, 238, 0.05);
+    border-right: 4px solid var(--primary);
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 5px;
+}
+
+.about-project-features {
+    list-style-type: none;
+    padding-right: 20px;
+    margin: 15px 0;
+}
+
+.about-project-features li {
+    margin-bottom: 10px;
+    position: relative;
+    padding-right: 25px;
+    color: var(--dark);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.about-project-features li::before {
+    content: "\f058"; /* FontAwesome check-circle icon */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    color: var(--primary);
+    position: absolute;
+    right: 0;
+    font-size: 1.1rem;
+}
+
+.project-stats-container {
+    margin-top: 25px;
+}
+
+.project-stats {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px 15px;
+    border-radius: 8px;
+    min-width: 80px;
+    text-align: center;
+    border: 1px solid rgba(67, 97, 238, 0.1);
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--primary);
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--gray);
+    display: block;
+    margin-top: 5px;
+}
+
+@media (max-width: 768px) {
+    .about-project-section h3 {
+        font-size: 1.5rem;
+    }
+    
+    .project-stats {
+        justify-content: center;
+    }
+    
+    .stat-item {
+        flex: 1;
+        min-width: 100px;
+    }
+}

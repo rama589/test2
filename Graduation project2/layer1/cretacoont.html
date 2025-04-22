@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>إنشاء حساب - TechSecure</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-navy: #0a0f1a;
+            --navy-blue: #183b5b;
+            --steel-blue: #9bb2c3;
+            --ghost-white: #f4f6f9;
+            
+            --primary: #183b5b;
+            --primary-light: #2a567f;
+            --primary-dark: #0f2a43;
+            --secondary: #1c4b7a;
+            --accent: #3a7cb9;
+            --danger: #e63946;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-navy), var(--navy-blue));
+            color: var(--ghost-white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+            direction: rtl;
+            unicode-bidi: embed;
+        }
+
+        /* تأثير الفقاعات الخلفية */
+        .bubbles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: rise 15s infinite ease-in;
+        }
+
+        @keyframes rise {
+            0% { bottom: -100px; transform: translateX(0); }
+            50% { transform: translateX(100px); }
+            100% { bottom: 120vh; transform: translateX(-200px); }
+        }
+
+        /* أنماط الفقاعات الفردية */
+        .bubble:nth-child(1) { width: 40px; height: 40px; left: 10%; animation-duration: 8s; }
+        .bubble:nth-child(2) { width: 20px; height: 20px; left: 20%; animation-duration: 5s; animation-delay: 1s; }
+        .bubble:nth-child(3) { width: 50px; height: 50px; left: 35%; animation-duration: 7s; animation-delay: 2s; }
+        .bubble:nth-child(4) { width: 80px; height: 80px; left: 50%; animation-duration: 11s; animation-delay: 0s; }
+        .bubble:nth-child(5) { width: 35px; height: 35px; left: 55%; animation-duration: 6s; animation-delay: 1s; }
+        .bubble:nth-child(6) { width: 45px; height: 45px; left: 65%; animation-duration: 8s; animation-delay: 3s; }
+        .bubble:nth-child(7) { width: 25px; height: 25px; left: 75%; animation-duration: 7s; animation-delay: 2s; }
+        .bubble:nth-child(8) { width: 80px; height: 80px; left: 80%; animation-duration: 6s; animation-delay: 1s; }
+
+        .register-container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            z-index: 2;
+            margin: 20px;
+            transition: all 0.5s ease;
+        }
+
+        .register-header {
+            background: linear-gradient(135deg, rgba(24, 59, 91, 0.8), rgba(10, 15, 26, 0.8));
+            color: var(--ghost-white);
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .register-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            animation: rotate 15s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo img {
+            width: 50px;
+        }
+
+        .register-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .register-header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .register-body {
+            padding: 30px;
+            position: relative;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--ghost-white);
+            font-size: 0.95rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .form-group input, 
+        .form-group select {
+            width: 100%;
+            padding: 14px 20px 14px 45px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--dark);
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--steel-blue);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--navy-blue);
+            font-size: 1.1rem;
+        }
+
+        .password-strength {
+            margin-top: 5px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s;
+        }
+
+        .password-strength-text {
+            font-size: 0.75rem;
+            color: var(--ghost-white);
+            margin-top: 4px;
+            text-align: right;
+        }
+
+        .terms-checkbox {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .terms-checkbox input {
+            margin-left: 10px;
+            margin-top: 3px;
+        }
+
+        .terms-checkbox label {
+            font-size: 0.85rem;
+            color: var(--ghost-white);
+            line-height: 1.4;
+        }
+
+        .terms-checkbox a {
+            color: var(--ghost-white);
+            text-decoration: underline;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to left, var(--navy-blue), var(--primary-light));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(24, 59, 91, 0.5);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+        }
+
+        .divider::before, 
+        .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .divider::before { margin-left: 10px; }
+        .divider::after { margin-right: 10px; }
+
+        .social-register {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .social-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+
+        .social-btn.google { background: linear-gradient(135deg, #EA4335, #FBBC05); }
+        .social-btn.facebook { background: linear-gradient(135deg, #1877F2, #0A58E4); }
+        .social-btn.twitter { background: linear-gradient(135deg, #1DA1F2, #0D8ECF); }
+
+        .social-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .login-link a {
+            color: var(--ghost-white);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* تحسينات للهواتف */
+        @media (max-width: 768px) {
+            .register-container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .register-header {
+                padding: 25px 20px;
+            }
+            
+            .register-body {
+                padding: 25px 20px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .form-group {
+                margin-bottom: 15px;
+            }
+            
+            .logo {
+                width: 70px;
+                height: 70px;
+            }
+            
+            .logo img {
+                width: 45px;
+            }
+            
+            .register-header h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .register-header {
+                padding: 20px 15px;
+            }
+            
+            .register-body {
+                padding: 20px 15px;
+            }
+            
+            .form-group input, 
+            .form-group select {
+                padding: 12px 15px 12px 40px;
+                font-size: 0.9rem;
+            }
+            
+            .input-icon {
+                left: 12px;
+                font-size: 1rem;
+            }
+            
+            .btn-register {
+                padding: 12px;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+    
+    <div class="register-container">
+        <div class="register-header">
+            <div class="logo">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjMTgzYjViIiBkPSJNMjU2IDhDMTE5IDggOCAxMTkgOCAyNTZzMTExIDI0OCAyNDggMjQ4IDI0OC0xMTEgMjQ4LTI0OFMzOTMgOCAyNTYgOHptMCA0NDhjLTExMC41IDAtMjAwLTg5LjUtMjAwLTIwMFMxNDUuNSA1NiAyNTYgNTZzMjAwIDg5LjUgMjAwIDIwMC04OS41IDIwMC0yMDAgMjAwem02NS4yLTE0Ni43Yy0zLjEgMy4xLTguMiAzLjEtMTEuMyAwbC03MC4yLTcwLjJjLTYuMy02LjMtMTYuNC02LjMtMjIuNyAwLTYuMyA2LjMtNi4zIDE2LjQgMCAyMi43bDcwLjIgNzAuMmMuMy4zLjcuNCAxLjEuNC40IDAgLjgtLjEgMS4xLS40bDcwLjItNzAuMmM2LjMtNi4zIDYuMy0xNi40IDAtMjIuNy02LjQtNi4yLTE2LjQtNi4yLTIyLjcgMHoiLz48L3N2Zz4=" alt="TechSecure">
+            </div>
+            <h1>أنشئ حساب جديد</h1>
+            <p>انضم إلى مجتمع TechSecure واستمتع بمزايا حصرية</p>
+        </div>
+        
+        <div class="register-body">
+            <form id="registerForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName"><i class="fas fa-user"></i> الاسم الأول</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="firstName" placeholder="أدخل اسمك الأول" required>
+                            <i class="fas fa-user input-icon"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lastName"><i class="fas fa-user"></i> الاسم الأخير</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="lastName" placeholder="أدخل اسمك الأخير" required>
+                            <i class="fas fa-user input-icon"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email"><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="email" placeholder="أدخل بريدك الإلكتروني" required>
+                        <i class="fas fa-envelope input-icon"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="username"><i class="fas fa-at"></i> اسم المستخدم</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="username" placeholder="اختر اسم مستخدم فريد" required>
+                        <i class="fas fa-at input-icon"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-lock"></i> كلمة المرور</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" placeholder="أنشئ كلمة مرور قوية" required>
+                        <i class="fas fa-lock input-icon"></i>
+                    </div>
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                    </div>
+                    <div class="password-strength-text" id="passwordStrengthText"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword"><i class="fas fa-lock"></i> تأكيد كلمة المرور</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="confirmPassword" placeholder="أعد إدخال كلمة المرور" required>
+                        <i class="fas fa-lock input-icon"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="country"><i class="fas fa-globe"></i> الدولة</label>
+                    <div class="input-wrapper">
+                        <select id="country" required>
+                            <option value="" disabled selected>اختر دولتك</option>
+                            <option value="SA">المملكة العربية السعودية</option>
+                            <option value="AE">الإمارات العربية المتحدة</option>
+                            <option value="EG">مصر</option>
+                            <option value="KW">الكويت</option>
+                            <option value="QA">قطر</option>
+                            <option value="BH">البحرين</option>
+                            <option value="OM">عمان</option>
+                            <option value="JO">الأردن</option>
+                            <option value="LB">لبنان</option>
+                            <option value="IQ">العراق</option>
+                        </select>
+                        <i class="fas fa-globe input-icon"></i>
+                    </div>
+                </div>
+                
+                <div class="terms-checkbox">
+                    <input type="checkbox" id="terms" required>
+                    <label for="terms">أوافق على <a href="#">شروط الخدمة</a> و <a href="#">سياسة الخصوصية</a></label>
+                </div>
+                
+                <button type="submit" class="btn-register">
+                    <i class="fas fa-user-plus"></i> إنشاء حساب
+                </button>
+            </form>
+            
+            <div class="divider">أو</div>
+            
+            <div class="social-register">
+                <a href="#" class="social-btn google" title="التسجيل باستخدام Google">
+                    <i class="fab fa-google"></i>
+                </a>
+                <a href="#" class="social-btn facebook" title="التسجيل باستخدام Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="social-btn twitter" title="التسجيل باستخدام Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+            </div>
+            
+            <div class="login-link">
+                لديك حساب بالفعل؟ <a href="./login.html">سجل الدخول الآن</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // تحقق من قوة كلمة المرور
+            const passwordInput = document.getElementById('password');
+            const strengthBar = document.getElementById('passwordStrengthBar');
+            const strengthText = document.getElementById('passwordStrengthText');
+            
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                
+                if (password.length >= 8) strength += 1;
+                if (password.length >= 12) strength += 1;
+                if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength += 1;
+                if (/\d/.test(password)) strength += 1;
+                if (/[^a-zA-Z0-9]/.test(password)) strength += 1;
+                
+                if (password.length === 0) {
+                    strengthBar.style.width = '0%';
+                    strengthBar.style.backgroundColor = 'transparent';
+                    strengthText.textContent = '';
+                } else {
+                    if (strength <= 1) {
+                        strengthBar.style.width = '25%';
+                        strengthBar.style.backgroundColor = 'var(--danger)';
+                        strengthText.textContent = 'قوة كلمة المرور: ضعيفة';
+                    } else if (strength <= 3) {
+                        strengthBar.style.width = '50%';
+                        strengthBar.style.backgroundColor = 'var(--warning)';
+                        strengthText.textContent = 'قوة كلمة المرور: متوسطة';
+                    } else {
+                        strengthBar.style.width = '100%';
+                        strengthBar.style.backgroundColor = 'var(--success)';
+                        strengthText.textContent = 'قوة كلمة المرور: قوية';
+                    }
+                }
+            });
+            
+            // تحقق من تطابق كلمة المرور
+            const confirmPassword = document.getElementById('confirmPassword');
+            confirmPassword.addEventListener('input', function() {
+                if (this.value !== passwordInput.value) {
+                    this.setCustomValidity('كلمة المرور غير متطابقة');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+            
+            // منع إرسال النموذج للتجربة
+            document.getElementById('registerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('تم إرسال النموذج بنجاح (هذه رسالة تجريبية)');
+            });
+        });
+    </script>
+</body>
+</html>

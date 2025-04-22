@@ -1,0 +1,2173 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام محاكاة الاختراق الإلكتروني</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-navy: #0a0f1a;
+            --navy-blue: #183b5b;
+            --steel-blue: #9bb2c3;
+            --ghost-white: #f4f6f9;
+            --primary: #183b5b;
+            --primary-dark: #0f2a43;
+            --primary-light: #2a567f;
+            --secondary: #1c4b7a;
+            --accent: #3a7cb9;
+            --danger: #e63946;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --glass-bg: rgba(248, 249, 250, 0.95);
+            --shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: var(--ghost-white);
+            color: var(--dark-navy);
+            line-height: 1.6;
+            padding-top: 80px;
+            overflow-x: hidden;
+        }
+
+        /* شريط التحميل المتطور */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--dark-navy);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-content {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .loading-logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 30px;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        .loading-progress-container {
+            width: 300px;
+            max-width: 80%;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .loading-progress-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--danger), #c82333);
+            border-radius: 5px;
+            transition: width 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                            transparent, 
+                            rgba(255, 255, 255, 0.4), 
+                            transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .loading-percentage {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .loading-details {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-top: 20px;
+            min-height: 20px;
+        }
+
+        .loading-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .loading-particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: floatParticle linear infinite;
+        }
+
+        /* شريط التنقل */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(10, 15, 26, 0.1);
+            border-bottom: 1px solid rgba(155, 178, 195, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 5px 25px rgba(10, 15, 26, 0.15);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 12px;
+        }
+
+        .logo-img {
+            height: 36px;
+            width: auto;
+            transition: transform 0.3s;
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--navy-blue);
+            position: relative;
+        }
+
+        .brand-name::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s;
+        }
+
+        .brand-logo:hover .brand-name::after {
+            transform: scaleX(1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 18px;
+            text-decoration: none;
+            color: var(--dark-navy);
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link i {
+            margin-left: 8px;
+            font-size: 1rem;
+            transition: transform 0.3s;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(24, 59, 91, 0.1), rgba(58, 124, 185, 0.1));
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            z-index: -1;
+        }
+
+        .nav-link:hover {
+            color: var(--navy-blue);
+        }
+
+        .nav-link:hover::before {
+            transform: translateY(0);
+        }
+
+        .nav-link:hover i {
+            transform: translateX(-3px);
+        }
+
+        .nav-link.active {
+            background: var(--danger);
+            color: var(--ghost-white);
+            box-shadow: 0 5px 15px rgba(230, 57, 70, 0.2);
+        }
+
+        /* قسم البطل */
+        .hero-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--danger), #c82333);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            transform: translateY(30px);
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .hero-description {
+            font-size: 1.15rem;
+            opacity: 0;
+            margin-bottom: 35px;
+            line-height: 1.8;
+            animation: fadeInUp 1s ease 0.3s forwards;
+        }
+
+        /* إحصائيات البطل */
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 1s ease 0.6s forwards;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(5px);
+            border-radius: 12px;
+            padding: 20px 30px;
+            min-width: 150px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            transform: scale(0.9);
+            animation: scaleIn 0.5s ease 0.9s forwards;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-5px) scale(1);
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* تحذير أمني */
+        .security-alert {
+            background-color: #fff3cd;
+            border-right: 5px solid #ffc107;
+            padding: 25px;
+            margin: 60px auto;
+            border-radius: 0 12px 12px 0;
+            max-width: 1200px;
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            animation: fadeIn 0.5s ease-out;
+            box-shadow: 0 5px 20px rgba(255, 193, 7, 0.1);
+            transition: transform 0.3s;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease 1.2s forwards;
+        }
+
+        .security-alert:hover {
+            transform: translateX(5px) translateY(0);
+        }
+
+        .alert-icon {
+            color: #ffc107;
+            font-size: 2rem;
+            flex-shrink: 0;
+            animation: pulse 2s infinite;
+        }
+
+        .alert-content h3 {
+            color: #856404;
+            margin: 0 0 15px 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .alert-content p {
+            color: #856404;
+            margin: 0;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        /* أدوات الاختراق */
+        .hacking-section {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease 1.5s forwards;
+        }
+
+        .section-title h2 {
+            font-size: 2.3rem;
+            color: var(--dark-navy);
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            right: 50%;
+            transform: translateX(50%);
+            width: 100px;
+            height: 5px;
+            background: var(--danger);
+            border-radius: 3px;
+        }
+
+        .hacking-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease 1.8s forwards;
+        }
+
+        .hacking-icon {
+            width: 120px;
+            height: 120px;
+            background: rgba(230, 57, 70, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 3rem;
+            color: var(--danger);
+            transition: all 0.3s;
+            transform: scale(0);
+            animation: scaleIn 0.8s ease 2.1s forwards;
+        }
+
+        .hacking-content p {
+            color: var(--navy-blue);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+
+        /* أزرار */
+        .btn {
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            font-size: 1.1rem;
+            transform: translateY(10px);
+            opacity: 0;
+            animation: fadeInUp 0.8s ease 2.4s forwards;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--ghost-white);
+            border: 2px solid var(--danger);
+            box-shadow: 0 5px 15px rgba(230, 57, 70, 0.2);
+        }
+
+        .btn-danger::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2));
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(230, 57, 70, 0.3);
+        }
+
+        .btn-danger:hover::before {
+            transform: translateX(0);
+        }
+
+        /* لوحة التحكم */
+        .interactive-dashboard {
+            padding: 80px 0;
+            background: linear-gradient(135deg, rgba(244, 246, 249, 0.9), rgba(235, 239, 244, 0.9));
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+            transition: transform 0.3s;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .dashboard-card:nth-child(1) {
+            animation: fadeInUp 0.8s ease 0.3s forwards;
+        }
+        .dashboard-card:nth-child(2) {
+            animation: fadeInUp 0.8s ease 0.6s forwards;
+        }
+        .dashboard-card:nth-child(3) {
+            animation: fadeInUp 0.8s ease 0.9s forwards;
+        }
+        .dashboard-card:nth-child(4) {
+            animation: fadeInUp 0.8s ease 1.2s forwards;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-10px) translateY(0);
+        }
+
+        .card-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(24, 59, 91, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.8rem;
+            color: var(--navy-blue);
+        }
+
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin: 15px auto;
+        }
+
+        .status-indicator.active {
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        .counter {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--danger);
+            margin: 15px 0;
+            display: inline-block;
+        }
+
+        .timer {
+            font-size: 1.8rem;
+            font-family: monospace;
+            margin: 15px 0;
+        }
+
+        .progress-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 8px solid var(--accent);
+            border-left-color: #eee;
+            margin: 10px auto;
+            transform: rotate(45deg);
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            margin-top: 15px;
+        }
+
+        /* أنظمة محاكاة متقدمة */
+        .advanced-simulations {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .simulation-tabs {
+            max-width: 1000px;
+            margin: 0 auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.07);
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+
+        .tab-header {
+            display: flex;
+            background: var(--ghost-white);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--navy-blue);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 3px;
+            background: var(--danger);
+            transition: width 0.3s;
+        }
+
+        .tab-btn:hover::after {
+            width: 100%;
+        }
+
+        .tab-btn.active {
+            background: var(--navy-blue);
+            color: white;
+        }
+
+        .tab-content {
+            padding: 30px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .simulation-preview {
+            height: 200px;
+            background: #f5f5f5;
+            margin: 20px 0;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--navy-blue);
+        }
+
+        /* ميزات تعليمية */
+        .innovative-features {
+            padding: 80px 0;
+            background: linear-gradient(135deg, rgba(244, 246, 249, 0.9), rgba(235, 239, 244, 0.9));
+        }
+
+        .features-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+        }
+
+        .feature-box {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+            transition: transform 0.3s;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .feature-box:nth-child(1) {
+            animation: fadeInUp 0.8s ease 0.3s forwards;
+        }
+        .feature-box:nth-child(2) {
+            animation: fadeInUp 0.8s ease 0.6s forwards;
+        }
+        .feature-box:nth-child(3) {
+            animation: fadeInUp 0.8s ease 0.9s forwards;
+        }
+
+        .feature-box:hover {
+            transform: translateY(-10px) translateY(0);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(24, 59, 91, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 2rem;
+            color: var(--navy-blue);
+            transition: all 0.3s;
+        }
+
+        .feature-box:hover .feature-icon {
+            background: var(--navy-blue);
+            color: white;
+            transform: rotate(15deg);
+        }
+
+        /* التذييل */
+        footer {
+            background: var(--dark-navy);
+            color: var(--ghost-white);
+            padding: 80px 0 40px;
+            position: relative;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 50px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 12px;
+        }
+
+        .footer-logo img {
+            height: 35px;
+            transition: transform 0.3s;
+        }
+
+        .footer-logo span {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--ghost-white);
+            position: relative;
+        }
+
+        .footer-logo span::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--danger);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s;
+        }
+
+        .footer-logo:hover span::after {
+            transform: scaleX(1);
+        }
+
+        .footer-about p {
+            color: var(--steel-blue);
+            line-height: 1.8;
+            margin-bottom: 25px;
+            font-size: 1.05rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-link {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(155, 178, 195, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--ghost-white);
+            transition: all 0.3s;
+            font-size: 1.2rem;
+        }
+
+        .social-link:hover {
+            background: var(--danger);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(230, 57, 70, 0.3);
+        }
+
+        .footer-links h3 {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-links h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--danger);
+            border-radius: 3px;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: var(--steel-blue);
+            text-decoration: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            position: relative;
+        }
+
+        .footer-links a::before {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            right: 0;
+            width: 0;
+            height: 2px;
+            background: var(--danger);
+            transition: width 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--ghost-white);
+            padding-right: 10px;
+        }
+
+        .footer-links a:hover::before {
+            width: 100%;
+        }
+
+        .footer-links a i {
+            font-size: 0.9rem;
+            transition: transform 0.3s;
+        }
+
+        .footer-links a:hover i {
+            transform: translateX(-5px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 40px;
+            margin-top: 50px;
+            border-top: 1px solid rgba(155, 178, 195, 0.3);
+            color: var(--steel-blue);
+            font-size: 0.95rem;
+        }
+
+        /* تأثيرات الحركة */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from { 
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(0) translateX(0); opacity: 1; }
+            100% { transform: translateY(-1000px) translateX(200px); opacity: 0; }
+        }
+
+        @keyframes countUp {
+            from { 
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to { 
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes flipNumber {
+            0% { transform: rotateX(0deg); }
+            50% { transform: rotateX(90deg); }
+            100% { transform: rotateX(0deg); }
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        @keyframes bgMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 1000px 1000px; }
+        }
+
+        @keyframes hackPulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes hackShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        @keyframes hackProgress {
+            0% { width: 0%; }
+            20% { width: 25%; }
+            40% { width: 50%; }
+            60% { width: 75%; }
+            80% { width: 90%; }
+            100% { width: 100%; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; visibility: hidden; }
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes loadingPulse {
+            0% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.7; }
+        }
+
+        @keyframes loadingSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* تأثيرات الجسيمات */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            animation: floatParticle linear infinite;
+        }
+
+        /* متابع الفأرة */
+        .cursor-follower {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(58, 124, 185, 0.5);
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: multiply;
+            transition: transform 0.1s ease;
+        }
+
+        .cursor-follower.active {
+            transform: translate(-50%, -50%) scale(2);
+            background: rgba(230, 57, 70, 0.5);
+        }
+
+        /* تأثيرات الاختراق */
+        .hack-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(230, 57, 70, 0.8);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            animation: hackPulse 0.5s ease-out;
+        }
+
+        .hack-animation i {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: hackShake 0.5s linear infinite;
+        }
+
+        .hack-animation p {
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .hack-progress {
+            width: 80%;
+            max-width: 400px;
+            height: 10px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 5px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+
+        .hack-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: white;
+            animation: hackProgress 2s linear forwards;
+        }
+
+        /* التكيف مع الشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-container {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-header {
+                flex-direction: column;
+            }
+            
+            .hero-stats {
+                gap: 15px;
+            }
+            
+            .stat-box {
+                min-width: 120px;
+                padding: 15px 20px;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+            
+            .loading-logo {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .loading-text {
+                font-size: 1.1rem;
+            }
+            
+            .loading-percentage {
+                font-size: 1.3rem;
+            }
+        }
+
+       /* أنماط الإشعارات والثغرات */
+.notification {
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--danger);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(230, 57, 70, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 9999;
+    animation: slideIn 0.3s ease-out;
+}
+
+.notification.hide {
+    animation: slideOut 0.3s ease-out forwards;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    margin-right: -5px;
+}
+
+.vulnerability-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    border-right: 5px solid var(--danger);
+    animation: fadeInUp 0.5s ease;
+}
+
+.vulnerability-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.vulnerability-title {
+    font-size: 1.3rem;
+    color: var(--danger);
+    font-weight: 700;
+}
+
+.vulnerability-severity {
+    background: var(--danger);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.vulnerability-description {
+    color: var(--navy-blue);
+    line-height: 1.7;
+    margin-bottom: 15px;
+}
+
+.vulnerability-solution {
+    background: rgba(76, 201, 240, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    border-right: 3px solid var(--success);
+}
+
+.solution-title {
+    color: var(--success);
+    font-weight: 700;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-30px);
+    }
+}
+
+    </style>
+</head>
+<body>
+    <!-- شريط التحميل المتطور -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-particles" id="loadingParticles"></div>
+        <div class="loading-content">
+            <img src="../ChatGPT Image 10 أبريل 2025، 09_30_14 ص.png" alt="Loading Logo" class="loading-logo">
+            <h2 class="loading-text">جاري تحميل نظام الاختراق</h2>
+            <div class="loading-percentage" id="loadingPercentage">0%</div>
+            <div class="loading-progress-container">
+                <div class="loading-progress-bar" id="loadingProgressBar"></div>
+            </div>
+            <div class="loading-details" id="loadingDetails">جاري تهيئة النظام...</div>
+        </div>
+    </div>
+
+    <!-- مؤثرات الجسيمات -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- مؤثر متابع الفأرة -->
+    <div class="cursor-follower" id="cursorFollower"></div>
+
+    <!-- شريط التنقل -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../1.html" class="brand-logo">
+                <img src="../ChatGPT Image 10 أبريل 2025، 09_30_14 ص.png" alt="Logo" class="logo-img">
+                <span class="brand-name">محاكاة الاختراق الإلكتروني</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="../1.html" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    الرئيسية
+                </a>
+                <a href="../store/index.html" class="nav-link">
+                    <i class="fas fa-store"></i>
+                    المتجر الإلكتروني
+                </a>
+                <a href="../hack-tools/sqli.html" class="nav-link">
+                    <i class="fas fa-tools"></i>
+                    أدوات الاختراق
+                </a>
+                <a href="#" class="nav-link active">
+                    <i class="fas fa-user-secret"></i>
+                    نظام الاختراق
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- قسم البطل -->
+    <section class="hero-section">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">نظام محاكاة الاختراق الإلكتروني</h1>
+                <p class="hero-description">
+                    تفعيل نظام الاختراق سيؤدي إلى كشف جميع الثغرات الأمنية في المتجر وإظهار نقاط الضعف
+                </p>
+                
+                <div class="hero-stats">
+                    <div class="stat-box">
+                        <div class="stat-number" id="hackCounter">0</div>
+                        <div class="stat-label">هجمة ناجحة</div>
+                    </div>
+                    
+                    <div class="stat-box">
+                        <div class="stat-number" id="vulnCounter">0</div>
+                        <div class="stat-label">ثغرة مكتشفة</div>
+                    </div>
+                    
+                    <div class="stat-box">
+                        <div class="stat-number" id="successRate">0%</div>
+                        <div class="stat-label">معدل النجاح</div>
+                    </div>
+                    
+                    <div class="stat-box">
+                        <div class="stat-number" id="timeCounter">0</div>
+                        <div class="stat-label">ثانية</div>
+                    </div>
+                </div>
+                
+               
+            </div>
+        </div>
+    </section>
+
+    <!-- تحذير أمني -->
+    <div class="security-alert">
+        <div class="alert-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="alert-content">
+            <h3>تنبيه هام!</h3>
+            <p>
+                هذا النظام مخصص لأغراض تعليمية وبحثية فقط. جميع المحتويات والأدوات تهدف إلى تعزيز الوعي الأمني
+                وليس للاستخدام غير القانوني. أي محاولة لاستخدام هذه المعرفة لأغراض غير مشروعة قد تعرضك للمساءلة القانونية.
+            </p>
+        </div>
+    </div>
+
+    <!-- قسم أدوات الاختراق -->
+    <section class="hacking-section">
+        <div class="section-title">
+            <h2>تفعيل نظام الاختراق</h2>
+        </div>
+        
+        <div class="hacking-content">
+            <div class="hacking-icon">
+                <i class="fas fa-user-secret"></i>
+            </div>
+            
+            <p>
+                نظام الاختراق سيقوم بكشف جميع الثغرات الأمنية في المتجر بما في ذلك:
+                ثغرات SQL Injection، XSS، CSRF، IDOR وغيرها من نقاط الضعف الشائعة.
+            </p>
+            
+            <a href="../store/index.html?hack_mode=true" class="btn btn-danger" id="activateHacking">
+                <i class="fas fa-unlock"></i> تفعيل الاختراق والعودة للمتجر
+            </a>
+        </div>
+    </section>
+
+    <!-- لوحة التحكم التفاعلية -->
+    <section class="interactive-dashboard">
+        <div class="section-title">
+            <h2>لوحة تحكم تفاعلية</h2>
+            <p>إدارة ومراقبة عملية الاختراق التعليمي</p>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <div class="card-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>حالة النظام</h3>
+                <div class="status-indicator active"></div>
+                <p>جاهز للاختراق التعليمي</p>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-icon">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <h3>الثغرات المكتشفة</h3>
+                <div class="counter" id="vulnerabilityCounter">0</div>
+                <button class="btn btn-small" id="showDetailsBtn">عرض التفاصيل</button>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h3>مدة المحاكاة</h3>
+                <div class="timer">00:00:00</div>
+                <button class="btn btn-small" id="pauseTimerBtn">إيقاف مؤقت</button>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>تقرير الأداء</h3>
+                <div class="counter" id="successRateCounter">0%</div>
+                <button class="btn btn-small" id="generateReportBtn">إنشاء تقرير</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- أنظمة محاكاة متقدمة -->
+    <section class="advanced-simulations">
+        <div class="section-title">
+            <h2>أنظمة محاكاة متقدمة</h2>
+            <p>اختر من بين سيناريوهات الاختراق التعليمية</p>
+        </div>
+        
+        <div class="simulation-tabs">
+            <div class="tab-header">
+                <button class="tab-btn active">SQL Injection</button>
+                <button class="tab-btn">XSS</button>
+                <button class="tab-btn">CSRF</button>
+                <button class="tab-btn">DDoS</button>
+            </div>
+            
+            <div class="tab-content active">
+                <h3>محاكاة هجوم SQL Injection</h3>
+                <p>تعلم كيفية استغلال ثغرات قواعد البيانات في الأنظمة غير المحمية</p>
+                <div class="simulation-preview">
+                    <i class="fas fa-database" style="font-size: 3rem;"></i>
+                    <p>نموذج محاكاة SQL Injection</p>
+                </div>
+                <button class="btn btn-danger">بدء المحاكاة</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ميزات تعليمية مبتكرة -->
+    <section class="innovative-features">
+        <div class="section-title">
+            <h2>ميزات تعليمية مبتكرة</h2>
+            <p>تعلم بأسلوب تفاعلي ممتع</p>
+        </div>
+        
+        <div class="features-container">
+            <div class="feature-box">
+                <div class="feature-icon">
+                    <i class="fas fa-video"></i>
+                </div>
+                <h3>دروس فيديو</h3>
+                <p>شاهد شرحًا مفصلًا لكل نوع من الهجمات</p>
+            </div>
+            
+            <div class="feature-box">
+                <div class="feature-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <h3>مختبر الأكواد</h3>
+                <p>جرب بنفسك في بيئة آمنة</p>
+            </div>
+            
+            <div class="feature-box">
+                <div class="feature-icon">
+                    <i class="fas fa-tasks"></i>
+                </div>
+                <h3>تحديات عملية</h3>
+                <p>اختبر مهاراتك في سيناريوهات واقعية</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- التذييل -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-about">
+                <div class="footer-logo">
+                    <img src="../ChatGPT Image 10 أبريل 2025، 09_30_14 ص.png" alt="Logo">
+                    <span>محاكاة الاختراق الإلكتروني</span>
+                </div>
+                <p>
+                    منصة تعليمية تهدف إلى رفع الوعي الأمني في مجال التجارة الإلكترونية
+                    من خلال توفير بيئة محاكاة آمنة لدراسة الهجمات الإلكترونية وتأثيرها
+                </p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                    <a href="#" class="social-link"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                <h3>روابط سريعة</h3>
+                <ul>
+                    <li><a href="../1.html"><i class="fas fa-chevron-left"></i> الصفحة الرئيسية</a></li>
+                    <li><a href="../store/index.html"><i class="fas fa-chevron-left"></i> المتجر الإلكتروني</a></li>
+                    <li><a href="../hack-tools/sqli.html"><i class="fas fa-chevron-left"></i> أدوات الاختراق</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> نظام الاختراق</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h3>موارد تعليمية</h3>
+                <ul>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> وثائق النظام</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> دراسات حالة</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> مقالات أمنية</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> الأسئلة الشائعة</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2025 نظام محاكاة الاختراق الإلكتروني. جميع الحقوق محفوظة. هذا الموقع لأغراض تعليمية فقط.</p>
+        </div>
+    </footer>
+
+    <audio id="hackSound" src="hack-sound.mp3" preload="auto"></audio>
+        
+    <script>
+        // شريط التحميل المتطور
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const loadingProgressBar = document.getElementById('loadingProgressBar');
+            const loadingPercentage = document.getElementById('loadingPercentage');
+            const loadingDetails = document.getElementById('loadingDetails');
+            const loadingParticles = document.getElementById('loadingParticles');
+            
+            // إنشاء جسيمات التحميل
+            function createLoadingParticles() {
+                const particleCount = 15;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    
+                    // أحجام عشوائية
+                    const size = Math.random() * 8 + 3;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    
+                    // مواقع عشوائية
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.top = `${Math.random() * 100}%`;
+                    
+                    // تأخيرات عشوائية
+                    const delay = Math.random() * 5;
+                    const duration = Math.random() * 15 + 10;
+                    particle.style.animationDelay = `${delay}s`;
+                    particle.style.animationDuration = `${duration}s`;
+                    
+                    loadingParticles.appendChild(particle);
+                }
+            }
+            
+            // محاكاة عملية التحميل
+            function simulateLoading() {
+                let progress = 0;
+                const loadingMessages = [
+                    "جاري تحميل المكونات الأساسية...",
+                    "تهيئة واجهة المستخدم...",
+                    "تحميل أدوات الاختراق...",
+                    "إعداد بيئة المحاكاة...",
+                    "جاري التحقق من النظام...",
+                    "التهيئة النهائية..."
+                ];
+                
+                createLoadingParticles();
+                
+                const interval = setInterval(() => {
+                    // زيادة عشوائية في التقدم
+                    progress += Math.random() * 10;
+                    if (progress > 100) progress = 100;
+                    
+                    loadingProgressBar.style.width = progress + '%';
+                    loadingPercentage.textContent = Math.floor(progress) + '%';
+                    
+                    // تغيير الرسالة بناءً على التقدم
+                    if (progress < 20) {
+                        loadingDetails.textContent = loadingMessages[0];
+                    } else if (progress < 40) {
+                        loadingDetails.textContent = loadingMessages[1];
+                    } else if (progress < 60) {
+                        loadingDetails.textContent = loadingMessages[2];
+                    } else if (progress < 75) {
+                        loadingDetails.textContent = loadingMessages[3];
+                    } else if (progress < 90) {
+                        loadingDetails.textContent = loadingMessages[4];
+                    } else {
+                        loadingDetails.textContent = loadingMessages[5];
+                    }
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        loadingScreen.classList.add('hidden');
+                        
+                        // إزالة شريط التحميل من DOM بعد انتهاء الانتقال
+                        setTimeout(() => {
+                            loadingScreen.style.display = 'none';
+                        }, 800);
+                    }
+                }, 200);
+            }
+            
+            // بدء عملية التحميل
+            simulateLoading();
+            
+            // تأثير التمرير للشريط العلوي
+            window.addEventListener('scroll', function() {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+      
+            // حفظ حالة الاختراق في localStorage
+            document.getElementById('activateHacking').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // إنشاء عنصر الرسوم المتحركة
+                const hackAnimation = document.createElement('div');
+                hackAnimation.className = 'hack-animation';
+                hackAnimation.innerHTML = `
+                    <i class="fas fa-user-secret"></i>
+                    <p>جاري تفعيل نظام الاختراق...</p>
+                    <div class="hack-progress">
+                        <div class="hack-progress-bar"></div>
+                    </div>
+                `;
+                
+                document.body.appendChild(hackAnimation);
+                
+                // تشغيل الصوت
+                const hackSound = document.getElementById('hackSound');
+                if (hackSound) {
+                    hackSound.play().catch(e => console.log("لا يمكن تشغيل الصوت:", e));
+                }
+                
+                // بعد انتهاء الرسوم المتحركة
+                setTimeout(() => {
+                    // حفظ حالة الاختراق
+                    localStorage.setItem('hackModeEnabled', 'true');
+                    
+                    // إزالة الرسوم المتحركة
+                    hackAnimation.style.animation = 'fadeOut 0.5s ease forwards';
+                    
+                    // الانتقال إلى صفحة المتجر بعد انتهاء الرسوم المتحركة
+                    setTimeout(() => {
+                        window.location.href = '../store/index.html?hack_mode=true';
+                    }, 500);
+                    
+                }, 2000); // مدة الرسوم المتحركة (2 ثانية)
+            });
+
+            // تفعيل نظام الألسنة
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+            });
+            
+            // تأثيرات تنازل الأرقام لقسم البطل
+            function animateValue(element, start, end, duration, suffix = '') {
+                let startTimestamp = null;
+                const step = (timestamp) => {
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                    const value = Math.floor(progress * (end - start) + start);
+                    element.textContent = value + suffix;
+                    
+                    // إضافة تأثير قلب عند كل تحديث
+                    element.classList.add('flipping');
+                    setTimeout(() => {
+                        element.classList.remove('flipping');
+                    }, 500);
+                    
+                    if (progress < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                };
+                window.requestAnimationFrame(step);
+            }
+
+            // بدء العدادات عند تحميل الصفحة
+            setTimeout(() => {
+                animateValue(document.getElementById('hackCounter'), 0, 256, 2000);
+                animateValue(document.getElementById('vulnCounter'), 0, 12, 2000);
+                animateValue(document.getElementById('successRate'), 0, 98, 2000, '%');
+                animateValue(document.getElementById('vulnerabilityCounter'), 0, 12, 2000);
+                animateValue(document.getElementById('successRateCounter'), 0, 87, 2000, '%');
+                
+                // عداد الوقت
+                let seconds = 0;
+                setInterval(() => {
+                    seconds++;
+                    document.getElementById('timeCounter').textContent = seconds;
+                    document.getElementById('timeCounter').classList.add('flipping');
+                    setTimeout(() => {
+                        document.getElementById('timeCounter').classList.remove('flipping');
+                    }, 500);
+                    
+                    // تحديث المؤقت
+                    const timer = document.querySelector('.timer');
+                    if (timer) {
+                        const hrs = Math.floor(seconds / 3600).toString().padStart(2, '0');
+                        const mins = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+                        const secs = (seconds % 60).toString().padStart(2, '0');
+                        timer.textContent = `${hrs}:${mins}:${secs}`;
+                        timer.classList.add('counting-animation');
+                        setTimeout(() => {
+                            timer.classList.remove('counting-animation');
+                        }, 500);
+                    }
+                }, 1000);
+            }, 500);
+
+            // تأثيرات الأزرار
+            document.getElementById('showDetailsBtn').addEventListener('click', function() {
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحميل...';
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-check"></i> تم التحميل';
+                }, 1500);
+            });
+
+            document.getElementById('generateReportBtn').addEventListener('click', function() {
+                this.innerHTML = '<i class="fas fa-file-alt"></i> جاري الإنشاء...';
+                setTimeout(() => {
+                    this.innerHTML = '<i class="fas fa-download"></i> التقرير جاهز';
+                }, 2000);
+            });
+
+            // نظام متابع الفأرة
+            const cursorFollower = document.getElementById('cursorFollower');
+            document.addEventListener('mousemove', (e) => {
+                cursorFollower.style.left = e.clientX + 'px';
+                cursorFollower.style.top = e.clientY + 'px';
+            });
+            
+            // تفعيل تأثير الفأرة عند التمرير على العناصر
+            const interactiveElements = document.querySelectorAll('a, button, .dashboard-card, .feature-box');
+            interactiveElements.forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    cursorFollower.classList.add('active');
+                });
+                el.addEventListener('mouseleave', () => {
+                    cursorFollower.classList.remove('active');
+                });
+            });
+            
+            // نظام الجسيمات الرئيسي
+            const particlesContainer = document.getElementById('particles');
+            function createParticles() {
+                const particleCount = 30;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    
+                    // أحجام عشوائية
+                    const size = Math.random() * 10 + 5;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    
+                    // مواقع عشوائية
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.bottom = `-${size}px`;
+                    
+                    // تأخيرات عشوائية
+                    const delay = Math.random() * 10;
+                    const duration = Math.random() * 20 + 10;
+                    particle.style.animationDelay = `${delay}s`;
+                    particle.style.animationDuration = `${duration}s`;
+                    
+                    particlesContainer.appendChild(particle);
+                }
+            }
+            
+            // تأثيرات عند التمرير
+            function handleScrollAnimations() {
+                const elements = document.querySelectorAll('.dashboard-card, .feature-box, .simulation-tabs');
+                
+                elements.forEach(el => {
+                    const rect = el.getBoundingClientRect();
+                    const isVisible = rect.top < window.innerHeight * 0.8;
+                    
+                    if (isVisible) {
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }
+                });
+            }
+            
+            // تهيئة تأثيرات الجسيمات
+            createParticles();
+            
+            // إعداد مستمعات الأحداث
+            window.addEventListener('scroll', handleScrollAnimations);
+            window.addEventListener('load', handleScrollAnimations);
+            
+            // تأثيرات إضافية للأزرار
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    // تأثير النقر
+                    const x = e.clientX - e.target.getBoundingClientRect().left;
+                    const y = e.clientY - e.target.getBoundingClientRect().top;
+                    
+                    const ripple = document.createElement('span');
+                    ripple.classList.add('ripple');
+                    ripple.style.left = `${x}px`;
+                    ripple.style.top = `${y}px`;
+                    this.appendChild(ripple);
+                    
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 1000);
+                });
+            });
+        });
+
+
+        // حفظ حالة الاختراق في localStorage
+document.getElementById('activateHacking').addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // إنشاء عنصر الرسوم المتحركة
+    const hackAnimation = document.createElement('div');
+    hackAnimation.className = 'hack-animation';
+    hackAnimation.innerHTML = `
+        <i class="fas fa-user-secret"></i>
+        <p>جاري تفعيل نظام الاختراق...</p>
+        <div class="hack-progress">
+            <div class="hack-progress-bar"></div>
+        </div>
+    `;
+    
+    document.body.appendChild(hackAnimation);
+    
+    // تشغيل الصوت
+    const hackSound = document.getElementById('hackSound');
+    if (hackSound) {
+        hackSound.play().catch(e => console.log("لا يمكن تشغيل الصوت:", e));
+    }
+    
+    // بعد انتهاء الرسوم المتحركة
+    setTimeout(() => {
+        // حفظ حالة الاختراق
+        localStorage.setItem('hackModeEnabled', 'true');
+        
+        // إزالة الرسوم المتحركة
+        hackAnimation.style.animation = 'fadeOut 0.5s ease forwards';
+        
+        // الانتقال إلى صفحة المتجر بعد انتهاء الرسوم المتحركة
+        setTimeout(() => {
+            window.location.href = '../store/index.html?hack_mode=true';
+        }, 500);
+        
+    }, 2000); // مدة الرسوم المتحركة (2 ثانية)
+});
+
+// تحقق من وضع الاختراق عند تحميل الصفحة
+window.addEventListener('DOMContentLoaded', function() {
+    if (window.location.search.includes('hack_mode=true')) {
+        showHackingResults();
+    }
+});
+
+// عرض نتائج الاختراق
+function showHackingResults() {
+    // إنشاء إشعار قابل للإغلاق
+    const notification = document.createElement('div');
+    notification.className = 'notification';
+    notification.innerHTML = `
+        <i class="fas fa-bug"></i>
+        <span>تم اكتشاف ثغرات أمنية في المتجر!</span>
+        <button class="notification-close" onclick="this.parentElement.classList.add('hide')">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // إزالة الإشعار بعد 10 ثواني تلقائياً
+    setTimeout(() => {
+        notification.classList.add('hide');
+        setTimeout(() => notification.remove(), 300);
+    }, 10000);
+    
+    // إنشاء قسم عرض الثغرات
+    const vulnerabilitiesSection = document.createElement('div');
+    vulnerabilitiesSection.id = 'vulnerabilities-section';
+    vulnerabilitiesSection.innerHTML = `
+        <h2 style="margin: 30px 0 20px; color: var(--danger); text-align: center;">
+            <i class="fas fa-shield-alt"></i> تقرير الثغرات الأمنية
+        </h2>
+        <div id="vulnerabilities-container"></div>
+    `;
+    
+    // إضافة قسم الثغرات إلى بداية body
+    document.body.insertBefore(vulnerabilitiesSection, document.body.firstChild);
+    
+    // بيانات الثغرات (يمكن استبدالها ببيانات حقيقية)
+    const vulnerabilities = [
+        {
+            title: "ثغرة SQL Injection",
+            severity: "عالية",
+            description: "تم اكتشاف ثغرة حقن SQL في صفحة تسجيل الدخول. تسمح هذه الثغرة للمهاجمين بتنفيذ أوامر SQL غير مصرح بها على قاعدة بيانات النظام.",
+            solution: "استخدام استعلامات معلمة (Prepared Statements) أو ORM لتجنب حقن SQL. التحقق من صحة المدخلات قبل معالجتها."
+        },
+        {
+            title: "ثغرة XSS (Cross-Site Scripting)",
+            severity: "متوسطة",
+            description: "تم اكتشاف ثغرة XSS في قسم التعليقات. تسمح هذه الثغرة للمهاجمين بحقن أكواد JavaScript ضارة يتم تنفيذها عند زيارة المستخدمين للصفحة.",
+            solution: "تنظيف المدخلات (Input Sanitization) وتشفير المخرجات (Output Encoding). استخدام مكتبات مثل DOMPurify لتنظيف HTML."
+        },
+        {
+            title: "مشكلة في صلاحيات المستخدم",
+            severity: "عالية",
+            description: "تم اكتشاف أن المستخدمين العاديين يمكنهم الوصول إلى صفحات إدارة المتجر دون الحصول على الصلاحيات المناسبة.",
+            solution: "تنفيذ نظام تحكم في الصلاحيات (RBAC). التحقق من الصلاحيات قبل السماح بالوصول إلى أي صفحة إدارية."
+        }
+    ];
+    
+    // عرض الثغرات
+    const container = document.getElementById('vulnerabilities-container');
+    vulnerabilities.forEach(vuln => {
+        const card = document.createElement('div');
+        card.className = 'vulnerability-card';
+        card.innerHTML = `
+            <div class="vulnerability-header">
+                <h3 class="vulnerability-title">${vuln.title}</h3>
+                <span class="vulnerability-severity">خطورة: ${vuln.severity}</span>
+            </div>
+            <p class="vulnerability-description">${vuln.description}</p>
+            <div class="vulnerability-solution">
+                <h4 class="solution-title"><i class="fas fa-lightbulb"></i> الحل المقترح</h4>
+                <p>${vuln.solution}</p>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+// حفظ حالة الاختراق في localStorage والانتقال للمتجر
+document.getElementById('activateHacking').addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // إنشاء رسوم متحركة للاختراق
+    const hackAnimation = document.createElement('div');
+    hackAnimation.className = 'hack-animation';
+    hackAnimation.innerHTML = `
+        <i class="fas fa-user-secret"></i>
+        <p>جاري تفعيل نظام الاختراق...</p>
+        <div class="hack-progress">
+            <div class="hack-progress-bar"></div>
+        </div>
+    `;
+    
+    document.body.appendChild(hackAnimation);
+    
+    // تشغيل الصوت (إذا كان موجوداً)
+    const hackSound = document.getElementById('hackSound');
+    if (hackSound) {
+        hackSound.play().catch(e => console.log("لا يمكن تشغيل الصوت:", e));
+    }
+    
+    // حفظ حالة الاختراق
+    localStorage.setItem('hackModeEnabled', 'true');
+    
+    // الانتقال بعد انتهاء الرسوم المتحركة
+    setTimeout(() => {
+        window.location.href = '../store/index.html?hack_mode=true';
+    }, 2000);
+});
+
+// عند الضغط على زر الاختراق
+document.getElementById('activateHacking').addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // 1. عرض رسوم متحركة للاختراق
+    const hackAnimation = document.createElement('div');
+    hackAnimation.className = 'hack-animation';
+    hackAnimation.innerHTML = `
+        <i class="fas fa-user-secret"></i>
+        <p>جاري تفعيل نظام الاختراق...</p>
+        <div class="hack-progress">
+            <div class="hack-progress-bar"></div>
+        </div>
+    `;
+    document.body.appendChild(hackAnimation);
+    
+    // 2. تشغيل الصوت (اختياري)
+    const hackSound = document.getElementById('hackSound');
+    if (hackSound) hackSound.play().catch(e => console.log("لا يمكن تشغيل الصوت:", e));
+    
+    // 3. حفظ حالة الاختراق مع تاريخ انتهاء الصلاحية (24 ساعة)
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 1);
+    localStorage.setItem('hackModeEnabled', 'true');
+    localStorage.setItem('hackExpiry', expiryDate.getTime());
+    
+    // 4. الانتقال إلى المتجر بعد 2 ثانية
+    setTimeout(() => {
+        window.location.href = '../store/index.html?hack_mode=true&t=' + Date.now();
+    }, 2000);
+});
+
+document.getElementById('activateHacking').addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // عرض رسوم متحركة للاختراق
+    const hackAnimation = document.createElement('div');
+    hackAnimation.className = 'hack-animation';
+    hackAnimation.innerHTML = `
+        <i class="fas fa-user-secret"></i>
+        <p>جاري تفعيل نظام الاختراق...</p>
+        <div class="hack-progress">
+            <div class="hack-progress-bar"></div>
+        </div>
+    `;
+    document.body.appendChild(hackAnimation);
+    
+    // حفظ حالة الاختراق في sessionStorage (ستختفي عند إغلاق المتصفح/إعادة التحميل)
+    sessionStorage.setItem('hackModeEnabled', 'true');
+    
+    // الانتقال إلى المتجر بعد 2 ثانية
+    setTimeout(() => {
+        window.location.href = '../store/index.html?hack_mode=true&t=' + Date.now();
+    }, 2000);
+});
+
+// عند الضغط على زر تفعيل الاختراق
+document.getElementById('activateHacking').addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // 1. تغيير مظهر الزر أثناء التفعيل
+    const btn = this;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التفعيل...';
+    btn.style.opacity = '0.7';
+    btn.style.cursor = 'not-allowed';
+    
+    // 2. عرض رسوم متحركة للاختراق
+    const hackAnimation = document.createElement('div');
+    hackAnimation.className = 'hack-animation';
+    hackAnimation.innerHTML = `
+        <i class="fas fa-user-secret"></i>
+        <p>جاري تفعيل نظام الاختراق...</p>
+        <div class="hack-progress">
+            <div class="hack-progress-bar"></div>
+        </div>
+    `;
+    document.body.appendChild(hackAnimation);
+    
+    // 3. تشغيل صوت الاختراق (إذا كان موجوداً)
+    const hackSound = document.getElementById('hackSound');
+    if (hackSound) {
+        hackSound.play().catch(e => console.log("تعذر تشغيل الصوت:", e));
+    }
+    
+    // 4. حفظ حالة الاختراق في localStorage و sessionStorage
+    localStorage.setItem('hackModeEnabled', 'true');
+    sessionStorage.setItem('hackModeEnabled', 'true');
+    
+    // 5. الانتقال إلى صفحة المتجر بعد انتهاء الرسوم المتحركة
+    setTimeout(() => {
+        window.location.href = '../store/index.html?hack_mode=true&t=' + Date.now();
+    }, 2000);
+});
+
+// عند تحميل صفحة المتجر (يجب وضع هذا الكود في صفحة المتجر index.html)
+window.addEventListener('DOMContentLoaded', function() {
+    // التحقق من وجود وضع الاختراق
+    const urlParams = new URLSearchParams(window.location.search);
+    const hackMode = urlParams.has('hack_mode') || 
+                    localStorage.getItem('hackModeEnabled') === 'true' ||
+                    sessionStorage.getItem('hackModeEnabled') === 'true';
+    
+    if (hackMode) {
+        showHackingPoints();
+        document.body.classList.add('hack-mode-active');
+    }
+    
+    // وظيفة عرض نقاط الاختراق
+    function showHackingPoints() {
+        // إزالة أي نقاط موجودة مسبقاً
+        document.querySelectorAll('.vulnerability-point').forEach(point => point.remove());
+        
+        // إنشاء نقاط الاختراق
+        const vulnerabilities = [
+            {
+                id: 'sql-injection',
+                title: "ثغرة SQL Injection",
+                severity: "high",
+                description: "يمكن حقن أوامر SQL عبر حقل اسم المستخدم",
+                solution: "استخدم استعلامات معلمة (Prepared Statements)",
+                position: { top: '65%', left: '30%' }
+            },
+            {
+                id: 'xss',
+                title: "ثغرة XSS (Cross-Site Scripting)",
+                severity: "medium",
+                description: "يمكن حقن أكواد JavaScript خبيثة عبر حقل البحث",
+                solution: "قم بتشفير أو إزالة الأحرف الخاصة في المدخلات",
+                position: { top: '20%', left: '50%' }
+            }
+        ];
+        
+        vulnerabilities.forEach(vuln => {
+            const point = document.createElement('div');
+            point.className = 'vulnerability-point';
+            point.style.top = vuln.position.top;
+            point.style.left = vuln.position.left;
+            point.innerHTML = '<i class="fas fa-bug"></i>';
+            point.onclick = (e) => {
+                e.stopPropagation();
+                showVulnerabilityDetails(vuln);
+            };
+            document.body.appendChild(point);
+        });
+    }
+    
+    // وظيفة عرض تفاصيل الثغرة
+    function showVulnerabilityDetails(vuln) {
+        // إخفاء أي تفاصيل معروضة مسبقاً
+        const existingDetails = document.querySelector('.vulnerability-details');
+        if (existingDetails) existingDetails.remove();
+        
+        // إنشاء عنصر التفاصيل
+        const details = document.createElement('div');
+        details.className = 'vulnerability-details';
+        details.innerHTML = `
+            <div class="details-header">
+                <h3>${vuln.title}</h3>
+                <button class="close-btn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="details-content">
+                <p><span class="severity ${vuln.severity}">${vuln.severity === 'high' ? 'عالية' : 'متوسطة'}</span> ${vuln.description}</p>
+                <div class="solution">
+                    <h4><i class="fas fa-lightbulb"></i> الحل المقترح</h4>
+                    <p>${vuln.solution}</p>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(details);
+        
+        // إضافة معالج الأحداث لإغلاق التفاصيل
+        details.querySelector('.close-btn').onclick = () => details.remove();
+    }
+});
+    </script>
+</body>
+</html>

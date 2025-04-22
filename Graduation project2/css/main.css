@@ -1,0 +1,62 @@
+/* متغيرات الخطوط */
+:root {
+    --font-primary: 'Tajawal', sans-serif;
+    --font-secondary: 'Almarai', sans-serif;
+    --font-icon: 'Font Awesome 6 Free';
+}
+
+/* تطبيق الخطوط */
+body {
+    font-family: var(--font-primary);
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-secondary);
+    font-weight: 700;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    line-height: 1.2;
+}
+
+.navbar {
+    font-family: var(--font-secondary);
+    font-weight: 500;
+}
+
+.btn, .search-bar input {
+    font-family: var(--font-primary);
+}
+/* تحسينات للغة العربية */
+body[dir="rtl"] {
+    letter-spacing: 0;
+    word-spacing: 0;
+}
+
+.arabic-text {
+    text-align: justify;
+    text-justify: inter-word;
+    hyphens: auto;
+}
+
+/* تحسين العناوين العربية */
+h1, h2, h3 {
+    line-height: 1.4;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+h1::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: -10px;
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(to left, #4361ee, #3a0ca3);
+}
+
+

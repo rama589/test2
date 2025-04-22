@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام محاكاة الجرائم الإلكترونية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- إضافة مكتبة GSAP للرسوم المتحركة -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    <!-- إضافة مكتبة particles.js للجسيمات المتحركة -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <!-- إضافة خط Tajawal للعربية -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-navy: #0a0f1a;
+            --navy-blue: #183b5b;
+            --steel-blue: #9bb2c3;
+            --ghost-white: #f4f6f9;
+            
+            --primary: #183b5b;
+            --primary-dark: #0f2a43;
+            --primary-light: #2a567f;
+            --secondary: #1c4b7a;
+            --accent: #3a7cb9;
+            --danger: #e63946;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --glass-bg: rgba(248, 249, 250, 0.95);
+            --shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: var(--ghost-white);
+            color: var(--dark-navy);
+            line-height: 1.6;
+            padding-top: 80px;
+            overflow-x: hidden;
+        }
+
+        /* شريط التحميل */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--ghost-white);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 30px;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        .loading-bar-container {
+            width: 300px;
+            max-width: 80%;
+            height: 8px;
+            background-color: rgba(24, 59, 91, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .loading-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--navy-blue), var(--accent));
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .loading-text {
+            color: var(--navy-blue);
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-top: 20px;
+        }
+
+        /* تحسينات على شريط التنقل */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(10, 15, 26, 0.1);
+            border-bottom: 1px solid rgba(155, 178, 195, 0.2);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 5px 25px rgba(10, 15, 26, 0.15);
+            background: rgba(248, 249, 250, 0.98);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .brand-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-img {
+            height: 36px;
+            width: auto;
+            transition: transform 0.3s;
+        }
+
+        .brand-logo:hover .logo-img {
+            transform: rotate(15deg);
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--navy-blue);
+            position: relative;
+        }
+
+        .brand-name::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s;
+        }
+
+        .brand-logo:hover .brand-name::after {
+            transform: scaleX(1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 18px;
+            text-decoration: none;
+            color: var(--dark-navy);
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link:hover {
+            transform: translateY(-3px);
+            color: var(--navy-blue);
+        }
+
+        .nav-link i {
+            margin-left: 8px;
+            font-size: 1rem;
+            transition: transform 0.3s;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(24, 59, 91, 0.1), rgba(58, 124, 185, 0.1));
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            z-index: -1;
+        }
+
+        .nav-link:hover::before {
+            transform: translateY(0);
+        }
+
+        .nav-link:hover i {
+            transform: translateX(-3px);
+        }
+
+        .nav-link.active {
+            background: var(--navy-blue);
+            color: var(--ghost-white);
+            box-shadow: 0 5px 15px rgba(24, 59, 91, 0.2);
+        }
+
+        /* تحسينات على قسم البطل */
+        .hero-section {
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(244, 246, 249, 0.9), rgba(235, 239, 244, 0.9));
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(58,124,185,0.1) 0%, rgba(255,255,255,0) 70%);
+            animation: pulse 15s infinite alternate;
+            z-index: 1;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content {
+            position: relative;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.2;
+            color: var(--dark-navy);
+            margin-bottom: 25px;
+            position: relative;
+            animation: slideInRight 1s ease-out forwards;
+        }
+
+        .hero-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 0;
+            width: 80px;
+            height: 5px;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .hero-description {
+            font-size: 1.15rem;
+            color: var(--navy-blue);
+            margin-bottom: 35px;
+            line-height: 1.8;
+            animation: fadeInUp 1s ease-out 0.3s forwards;
+            opacity: 0;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.6s forwards;
+            opacity: 0;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: var(--navy-blue);
+            color: var(--ghost-white);
+            border: 2px solid var(--navy-blue);
+            box-shadow: 0 5px 15px rgba(24, 59, 91, 0.2);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2));
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(24, 59, 91, 0.3);
+        }
+
+        .btn-primary:hover::before {
+            transform: translateX(0);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--navy-blue);
+            border: 2px solid var(--navy-blue);
+        }
+
+        .btn-outline:hover {
+            background: rgba(24, 59, 91, 0.05);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(24, 59, 91, 0.1);
+        }
+
+        .hero-image {
+            position: relative;
+            text-align: center;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px rgba(10, 15, 26, 0.15);
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .hero-image:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(10, 15, 26, 0.2);
+        }
+
+        .hero-image img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* تحسينات على التحذير الأمني */
+        .security-alert {
+            background-color: #fff3cd;
+            border-right: 5px solid #ffc107;
+            padding: 25px;
+            margin: 60px auto;
+            border-radius: 0 12px 12px 0;
+            max-width: 1200px;
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            animation: shake 0.5s ease-in-out infinite alternate, fadeIn 0.5s ease-out;
+            box-shadow: 0 5px 20px rgba(255, 193, 7, 0.1);
+            transition: all 0.5s ease;
+        }
+
+        .security-alert:hover {
+            animation: none;
+            transform: scale(1.02);
+        }
+
+        .alert-icon {
+            color: #ffc107;
+            font-size: 2rem;
+            flex-shrink: 0;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        /* تحسينات على قسم المميزات */
+        .features-section {
+            padding: 80px 0;
+            background: white;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .section-title h2 {
+            font-size: 2.3rem;
+            color: var(--dark-navy);
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            right: 50%;
+            transform: translateX(50%);
+            width: 100px;
+            height: 5px;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .section-title p {
+            color: var(--navy-blue);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 15px;
+            padding: 35px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.07);
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border: 1px solid rgba(155, 178, 195, 0.2);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            opacity: 0;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px) rotateX(5deg);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+            border-color: rgba(24, 59, 91, 0.3);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--accent);
+            transform: translateY(-100%);
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover::before {
+            transform: translateY(0);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(24, 59, 91, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 2rem;
+            color: var(--navy-blue);
+            transition: all 0.5s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+        }
+
+        .feature-card:hover .feature-icon {
+            background: var(--navy-blue);
+            color: var(--ghost-white);
+            transform: rotateY(360deg) scale(1.1);
+        }
+
+        .feature-card h3 {
+            font-size: 1.4rem;
+            color: var(--dark-navy);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .feature-card p {
+            color: var(--navy-blue);
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        /* تحسينات على قسم الأدوات التعليمية */
+        .tools-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, rgba(244, 246, 249, 0.9), rgba(235, 239, 244, 0.9));
+            position: relative;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            opacity: 0;
+            transform-style: preserve-3d;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-10px) rotateY(5deg);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .tool-header {
+            background: var(--navy-blue);
+            color: var(--ghost-white);
+            padding: 20px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2));
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+        }
+
+        .tool-card:hover .tool-header::before {
+            transform: translateX(0);
+        }
+
+        .tool-header i {
+            font-size: 1.8rem;
+            transition: all 0.5s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+        }
+
+        .tool-card:hover .tool-header i {
+            transform: rotate(15deg) scale(1.2);
+        }
+
+        .tool-header h3 {
+            font-size: 1.3rem;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .tool-body {
+            padding: 25px;
+        }
+
+        .tool-description {
+            color: var(--navy-blue);
+            margin-bottom: 25px;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .tool-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--navy-blue);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .tool-link::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            right: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s;
+        }
+
+        .tool-link:hover {
+            gap: 15px;
+            color: var(--primary-dark);
+        }
+
+        .tool-link:hover::after {
+            transform: scaleX(1);
+        }
+
+        /* تحسينات على التذييل */
+        footer {
+            background: var(--dark-navy);
+            color: var(--ghost-white);
+            padding: 80px 0 40px;
+            position: relative;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 50px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 12px;
+        }
+
+        .footer-logo img {
+            height: 35px;
+            transition: transform 0.3s;
+        }
+
+        .footer-logo:hover img {
+            transform: rotate(15deg);
+        }
+
+        .footer-logo span {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--ghost-white);
+            position: relative;
+        }
+
+        .footer-logo span::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s;
+        }
+
+        .footer-logo:hover span::after {
+            transform: scaleX(1);
+        }
+
+        .footer-about p {
+            color: var(--steel-blue);
+            line-height: 1.8;
+            margin-bottom: 25px;
+            font-size: 1.05rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-link {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(155, 178, 195, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--ghost-white);
+            transition: all 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+            font-size: 1.2rem;
+        }
+
+        .social-link:hover {
+            background: var(--navy-blue);
+            transform: translateY(-5px) rotate(10deg);
+            box-shadow: 0 5px 15px rgba(24, 59, 91, 0.3);
+        }
+
+        .footer-links h3 {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            position: relative;
+            padding-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .footer-links h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: var(--steel-blue);
+            text-decoration: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            position: relative;
+        }
+
+        .footer-links a:hover {
+            color: var(--ghost-white);
+            transform: translateX(-5px);
+        }
+
+        .footer-links a::before {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            right: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .footer-links a:hover::before {
+            width: 100%;
+        }
+
+        .footer-links a i {
+            font-size: 0.9rem;
+            transition: transform 0.3s;
+        }
+
+        .footer-links a:hover i {
+            transform: translateX(-5px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 40px;
+            margin-top: 50px;
+            border-top: 1px solid rgba(155, 178, 195, 0.3);
+            color: var(--steel-blue);
+            font-size: 0.95rem;
+            position: relative;
+        }
+
+        .footer-bottom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        /* تأثيرات الحركة */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.3; }
+            100% { transform: scale(1.2); opacity: 0.1; }
+        }
+
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(5px); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* تأثيرات الجسيمات المتحركة */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        /* موجات متحركة */
+        .wave-container {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 100%;
+            height: 100px;
+            overflow: hidden;
+            z-index: 1;
+        }
+        
+        .wave {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 200%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" fill="%23183b5b" opacity=".05"/><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" fill="%23183b5b" opacity=".1"/><path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="%23183b5b"/></svg>');
+            background-repeat: repeat-x;
+            animation: wave 15s linear infinite;
+        }
+        
+        @keyframes wave {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(50%); }
+        }
+
+        /* التكيف مع الشاشات الصغيرة */
+        @media (max-width: 992px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 40px;
+            }
+
+            .hero-title::after {
+                right: 50%;
+                transform: translateX(50%);
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-image {
+                max-width: 80%;
+                margin: 0 auto;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.3rem;
+            }
+
+            .section-title h2 {
+                font-size: 2rem;
+            }
+
+            .features-grid, .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .security-alert {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+            
+            .alert-icon {
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- شريط التحميل -->
+    <div class="loading-screen" id="loadingScreen">
+        <img src="ChatGPT Image 10 أبريل 2025، 09_30_14 ص.png" alt="Loading Logo" class="loading-logo">
+        <div class="loading-bar-container">
+            <div class="loading-bar" id="loadingBar"></div>
+        </div>
+        <p class="loading-text">جاري تحميل النظام...</p>
+    </div>
+
+    <!-- نظام الجسيمات المتحركة -->
+    <div id="particles-js"></div>
+
+    <!-- شريط التنقل -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="brand-logo">
+                <img src="ChatGPT Image 10 أبريل 2025، 09_30_14 ص.png" alt="Logo" class="logo-img">
+                <span class="brand-name">محاكاة الجرائم الإلكترونية</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="store/index.html" class="nav-link">
+                    <i class="fas fa-store"></i>
+                    المتجر الإلكتروني
+                </a>
+                <a href="admin/login.html" class="nav-link">
+                    <i class="fas fa-user-cog"></i>
+                    لوحة التحكم
+                </a>
+                <a href="hack-tools/sqli.html" class="nav-link active">
+                    <i class="fas fa-tools"></i>
+                    أدوات تعليمية
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- قسم البطل -->
+    <section class="hero-section">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    نظام محاكاة الجرائم الإلكترونية
+                </h1>
+                <p class="hero-description">
+                    منصة تعليمية متكاملة لدراسة تأثير الجرائم الإلكترونية على التجارة الإلكترونية
+                    وكيفية الوقاية منها في بيئة آمنة ومحكمة
+                </p>
+                <div class="hero-buttons">
+                    <a href="store/index.html" class="btn btn-primary">
+                        <i class="fas fa-play"></i> ابدأ المحاكاة
+                    </a>
+                    <a href="./about-system.html" class="btn btn-outline">
+                        <i class="fas fa-info-circle"></i> المزيد عن النظام
+                    </a>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="ChatGPT Image 10 أبريل 2025، 09_30_14 ص.png" alt="Cyber Security">
+            </div>
+        </div>
+        <!-- موجات متحركة -->
+        <div class="wave-container">
+            <div class="wave"></div>
+        </div>
+    </section>
+
+    <!-- تحذير أمني -->
+    <div class="security-alert">
+        <div class="alert-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <div class="alert-content">
+            <h3>تنبيه هام!</h3>
+            <p>
+                هذا النظام مخصص لأغراض تعليمية وبحثية فقط. جميع المحتويات والأدوات تهدف إلى تعزيز الوعي الأمني
+                وليس للاستخدام غير القانوني. أي محاولة لاستخدام هذه المعرفة لأغراض غير مشروعة قد تعرضك للمساءلة القانونية.
+            </p>
+        </div>
+    </div>
+
+    <!-- قسم المميزات -->
+    <section class="features-section" id="features">
+        <div class="section-title">
+            <h2>مميزات النظام</h2>
+            <p>منصة متكاملة توفر كل ما تحتاجه لدراسة الجرائم الإلكترونية والوقاية منها</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-laptop-code"></i>
+                </div>
+                <h3>محاكاة واقعية</h3>
+                <p>
+                    بيئة محاكاة متكاملة تحاكي الهجمات الإلكترونية الحقيقية على المتاجر الإلكترونية
+                    مع إمكانية تتبع تأثير كل هجوم
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>أدوات حماية</h3>
+                <p>
+                    مجموعة من الأدوات والتقنيات لتعلم كيفية حماية المتاجر الإلكترونية
+                    من الهجمات والاختراقات الأمنية
+                </p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>تحليل النتائج</h3>
+                <p>
+                    لوحات تحكم متقدمة لتحليل نتائج المحاكاة وتقييم تأثير الهجمات
+                    على أداء المتجر الإلكتروني
+                </p>
+            </div>
+        </div>
+        <!-- موجات متحركة -->
+        <div class="wave-container">
+            <div class="wave"></div>
+        </div>
+    </section>
+
+    <!-- قسم الأدوات التعليمية -->
+    <section class="tools-section">
+        <div class="section-title">
+            <h2>الأدوات التعليمية</h2>
+            <p>تعرف على أشهر الثغرات الأمنية وكيفية استغلالها والوقاية منها</p>
+        </div>
+        
+        <div class="tools-grid">
+            <div class="tool-card">
+                <div class="tool-header">
+                    <i class="fas fa-database"></i>
+                    <h3>حقن SQL</h3>
+                </div>
+                <div class="tool-body">
+                    <p class="tool-description">
+                        تعلم كيفية استغلال ثغرات حقن SQL في المتاجر الإلكترونية
+                        وكيفية منع هذه الهجمات باستخدام استعلامات آمنة
+                    </p>
+                    <a href="hack-tools/sqli.html" class="tool-link">
+                        ابدأ التعلم <i class="fas fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="tool-card">
+                <div class="tool-header">
+                    <i class="fas fa-code"></i>
+                    <h3>XSS</h3>
+                </div>
+                <div class="tool-body">
+                    <p class="tool-description">
+                        دراسة هجمات Cross-Site Scripting وكيفية استغلالها
+                        لسرقة بيانات المستخدمين، وتقنيات الحماية منها
+                    </p>
+                    <a href="hack-tools/xss.html" class="tool-link">
+                        ابدأ التعلم <i class="fas fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="tool-card">
+                <div class="tool-header">
+                    <i class="fas fa-lock"></i>
+                    <h3>إدارة الجلسات</h3>
+                </div>
+                <div class="tool-body">
+                    <p class="tool-description">
+                        فهم ثغرات إدارة الجلسات وكيفية استغلالها،
+                        وتعلم أفضل ممارسات تأمين جلسات المستخدمين
+                    </p>
+                    <a href="hack-tools/session.html" class="tool-link">
+                        ابدأ التعلم <i class="fas fa-arrow-left"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <!-- موجات متحركة -->
+        <div class="wave-container">
+            <div class="wave"></div>
+        </div>
+    </section>
+
+    <!-- التذييل -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-about">
+                <div class="footer-logo">
+                    <img src="ChatGPT Image 10 أبريل 2025، 09_30_14 ص.png" alt="Logo">
+                    <span>محاكاة الجرائم الإلكترونية</span>
+                </div>
+                <p>
+                    منصة تعليمية تهدف إلى رفع الوعي الأمني في مجال التجارة الإلكترونية
+                    من خلال توفير بيئة محاكاة آمنة لدراسة الهجمات الإلكترونية وتأثيرها
+                </p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                    <a href="#" class="social-link"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                <h3>روابط سريعة</h3>
+                <ul>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> الصفحة الرئيسية</a></li>
+                    <li><a href="store/index.html"><i class="fas fa-chevron-left"></i> المتجر الإلكتروني</a></li>
+                    <li><a href="admin/login.html"><i class="fas fa-chevron-left"></i> لوحة التحكم</a></li>
+                    <li><a href="hack-tools/sqli.html"><i class="fas fa-chevron-left"></i> الأدوات التعليمية</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h3>موارد تعليمية</h3>
+                <ul>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> وثائق النظام</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> دراسات حالة</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> مقالات أمنية</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> الأسئلة الشائعة</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>© 2025 نظام محاكاة الجرائم الإلكترونية. جميع الحقوق محفوظة. هذا الموقع لأغراض تعليمية فقط.</p>
+        </div>
+    </footer>
+
+    <script>
+        // شريط التحميل
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const loadingBar = document.getElementById('loadingBar');
+            
+            // محاكاة عملية التحميل
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress > 100) progress = 100;
+                loadingBar.style.width = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    loadingScreen.classList.add('hidden');
+                    
+                    // إزالة شريط التحميل من DOM بعد انتهاء الانتقال
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                    }, 500);
+                }
+            }, 200);
+            
+            // تأثير التمرير للشريط العلوي
+            window.addEventListener('scroll', function() {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+
+            // تهيئة الجسيمات المتحركة
+            particlesJS('particles-js', {
+                "particles": {
+                    "number": {
+                        "value": 80,
+                        "density": {
+                            "enable": true,
+                            "value_area": 800
+                        }
+                    },
+                    "color": {
+                        "value": "#183b5b"
+                    },
+                    "shape": {
+                        "type": "circle",
+                        "stroke": {
+                            "width": 0,
+                            "color": "#000000"
+                        },
+                        "polygon": {
+                            "nb_sides": 5
+                        }
+                    },
+                    "opacity": {
+                        "value": 0.5,
+                        "random": false,
+                        "anim": {
+                            "enable": false,
+                            "speed": 1,
+                            "opacity_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "size": {
+                        "value": 3,
+                        "random": true,
+                        "anim": {
+                            "enable": false,
+                            "speed": 40,
+                            "size_min": 0.1,
+                            "sync": false
+                        }
+                    },
+                    "line_linked": {
+                        "enable": true,
+                        "distance": 150,
+                        "color": "#9bb2c3",
+                        "opacity": 0.4,
+                        "width": 1
+                    },
+                    "move": {
+                        "enable": true,
+                        "speed": 2,
+                        "direction": "none",
+                        "random": false,
+                        "straight": false,
+                        "out_mode": "out",
+                        "bounce": false,
+                        "attract": {
+                            "enable": false,
+                            "rotateX": 600,
+                            "rotateY": 1200
+                        }
+                    }
+                },
+                "interactivity": {
+                    "detect_on": "canvas",
+                    "events": {
+                        "onhover": {
+                            "enable": true,
+                            "mode": "grab"
+                        },
+                        "onclick": {
+                            "enable": true,
+                            "mode": "push"
+                        },
+                        "resize": true
+                    },
+                    "modes": {
+                        "grab": {
+                            "distance": 140,
+                            "line_linked": {
+                                "opacity": 1
+                            }
+                        },
+                        "bubble": {
+                            "distance": 400,
+                            "size": 40,
+                            "duration": 2,
+                            "opacity": 8,
+                            "speed": 3
+                        },
+                        "repulse": {
+                            "distance": 200,
+                            "duration": 0.4
+                        },
+                        "push": {
+                            "particles_nb": 4
+                        },
+                        "remove": {
+                            "particles_nb": 2
+                        }
+                    }
+                },
+                "retina_detect": true
+            });
+
+            // تأثيرات GSAP للعناصر
+            gsap.registerPlugin(ScrollTrigger);
+            
+            // تأثيرات للبطاقات
+            gsap.utils.toArray(".feature-card").forEach((card, index) => {
+                gsap.from(card, {
+                    duration: 1,
+                    y: 50,
+                    opacity: 0,
+                    ease: "back.out(1.7)",
+                    scrollTrigger: {
+                        trigger: ".features-section",
+                        start: "top 80%",
+                        toggleActions: "play none none none"
+                    },
+                    delay: index * 0.1
+                });
+            });
+            
+            gsap.utils.toArray(".tool-card").forEach((card, index) => {
+                gsap.from(card, {
+                    duration: 1,
+                    x: -50,
+                    opacity: 0,
+                    ease: "power3.out",
+                    scrollTrigger: {
+                        trigger: ".tools-section",
+                        start: "top 80%",
+                        toggleActions: "play none none none"
+                    },
+                    delay: index * 0.1
+                });
+            });
+            
+            // تأثير عند تحميل الصفحة
+            gsap.from(".navbar", {
+                duration: 1,
+                y: -100,
+                ease: "elastic.out(1, 0.5)"
+            });
+            
+            // تأثيرات للروابط
+            document.querySelectorAll('a').forEach(link => {
+                link.addEventListener('mouseenter', function() {
+                    gsap.to(this, {
+                        duration: 0.3,
+                        scale: 1.05,
+                        ease: "power2.out"
+                    });
+                });
+                
+                link.addEventListener('mouseleave', function() {
+                    gsap.to(this, {
+                        duration: 0.3,
+                        scale: 1,
+                        ease: "power2.out"
+                    });
+                });
+            });
+            
+            // تحسين أداء الصفحة
+            window.addEventListener('load', function() {
+                // Precaching للصفحات المرتبطة
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                        console.log('ServiceWorker registration successful');
+                    }).catch(function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الدعم الفني - TechSecure</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #4895ef;
+            --dark: #2b2d42;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+        }
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .support-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .support-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .support-header h1 {
+            color: var(--primary);
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+        }
+        
+        .support-header p {
+            color: var(--gray);
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .support-card {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .support-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: rgba(67, 97, 238, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--primary);
+        }
+        
+        .support-card h3 {
+            color: var(--dark);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .support-card p {
+            color: var(--gray);
+            margin-bottom: 20px;
+        }
+        
+        .btn-support {
+            display: inline-block;
+            padding: 10px 25px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            border: 2px solid var(--primary);
+        }
+        
+        .btn-support:hover {
+            background: transparent;
+            color: var(--primary);
+        }
+        
+        .faq-section {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 50px;
+        }
+        
+        .faq-section h2 {
+            color: var(--dark);
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .faq-item {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 15px 0;
+        }
+        
+        .faq-question h3 {
+            color: var(--dark);
+            font-size: 1.3rem;
+            margin: 0;
+        }
+        
+        .faq-question i {
+            color: var(--primary);
+            transition: transform 0.3s ease;
+        }
+        
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            color: var(--gray);
+        }
+        
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding-top: 10px;
+        }
+        
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+        
+        .contact-form {
+            background: white;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .contact-form h2 {
+            color: var(--dark);
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+        
+        textarea.form-control {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .btn-submit {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 0 auto;
+            font-family: 'Tajawal', sans-serif;
+        }
+        
+        .btn-submit:hover {
+            background: var(--primary-light);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .support-container {
+                padding: 30px 15px;
+            }
+            
+            .support-header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .faq-section, .contact-form {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="support-container">
+        <header class="support-header">
+            <h1><i class="fas fa-headset"></i> الدعم الفني</h1>
+            <p>نحن هنا لمساعدتك! تواصل مع فريق الدعم الفني للحصول على المساعدة في أي مشكلة تواجهك</p>
+        </header>
+        
+        <div class="support-grid">
+            <div class="support-card">
+                <div class="card-icon">
+                    <i class="fas fa-phone-alt"></i>
+                </div>
+                <h3>الدعم الهاتفي</h3>
+                <p>تواصل معنا مباشرة عبر الهاتف للحصول على دعم فوري</p>
+                <a href="tel:+966123456789" class="btn-support">
+                    <i class="fas fa-phone"></i> +966 12 345 6789
+                </a>
+            </div>
+            
+            <div class="support-card">
+                <div class="card-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h3>البريد الإلكتروني</h3>
+                <p>أرسل استفسارك وسنرد عليك خلال 24 ساعة</p>
+                <a href="mailto:support@techsecure.com" class="btn-support">
+                    <i class="fas fa-paper-plane"></i> support@techsecure.com
+                </a>
+            </div>
+            
+            <div class="support-card">
+                <div class="card-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <h3>الدردشة الحية</h3>
+                <p>دردش مع ممثل الدعم مباشرة خلال ساعات العمل</p>
+                <button class="btn-support" id="liveChatBtn">
+                    <i class="fas fa-comment-dots"></i> بدء الدردشة
+                </button>
+            </div>
+        </div>
+        
+        <section class="faq-section">
+            <h2><i class="fas fa-question-circle"></i> الأسئلة الشائعة</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>كيف يمكنني إعادة تعيين كلمة المرور؟</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>لإعادة تعيين كلمة المرور، اتبع الخطوات التالية:</p>
+                    <ol>
+                        <li>انتقل إلى صفحة تسجيل الدخول</li>
+                        <li>انقر على "نسيت كلمة المرور"</li>
+                        <li>أدخل بريدك الإلكتروني المسجل</li>
+                        <li>اتبع التعليمات في الرسالة التي ستصل إليك</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>ما هي ساعات عمل الدعم الفني؟</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>فريق الدعم الفني متاح خلال الأوقات التالية:</p>
+                    <ul>
+                        <li>الأحد إلى الخميس: 8 صباحًا - 5 مساءً</li>
+                        <li>الجمعة والسبت: إجازة</li>
+                    </ul>
+                    <p>لحالات الطوارئ خارج ساعات العمل، يرجى استخدام نموذج الاتصال وسنرد في أقرب وقت ممكن.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <h3>هل المنصة تدعم الهواتف الذكية؟</h3>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>نعم، منصة TechSecure متوافقة تمامًا مع جميع الأجهزة المحمولة. يمكنك الوصول إلى جميع الميزات عبر:</p>
+                    <ul>
+                        <li>هواتف Android و iOS</li>
+                        <li>الأجهزة اللوحية</li>
+                        <li>المتصفحات الحديثة على الجوال</li>
+                    </ul>
+                    <p>لأفضل تجربة، نوصي باستخدام أحدث نسخة من المتصفح.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section class="contact-form">
+            <h2><i class="fas fa-paper-plane"></i> تواصل معنا</h2>
+            
+            <form id="supportForm">
+                <div class="form-group">
+                    <label for="name">الاسم الكامل</label>
+                    <input type="text" id="name" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">البريد الإلكتروني</label>
+                    <input type="email" id="email" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="subject">موضوع الاستفسار</label>
+                    <select id="subject" class="form-control" required>
+                        <option value="">اختر الموضوع...</option>
+                        <option value="technical">مشكلة تقنية</option>
+                        <option value="account">مشكلة في الحساب</option>
+                        <option value="billing">استفسار مالي</option>
+                        <option value="other">استفسار آخر</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="message">الرسالة</label>
+                    <textarea id="message" class="form-control" required></textarea>
+                </div>
+                
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-paper-plane"></i> إرسال الرسالة
+                </button>
+            </form>
+        </section>
+    </div>
+
+    <script>
+        // تفعيل الأسئلة الشائعة
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                item.classList.toggle('active');
+                
+                // إغلاق العناصر الأخرى
+                document.querySelectorAll('.faq-item').forEach(el => {
+                    if (el !== item) {
+                        el.classList.remove('active');
+                    }
+                });
+            });
+        });
+        
+        // محاكاة الدردشة الحية
+        document.getElementById('liveChatBtn').addEventListener('click', () => {
+            alert('نعتذر، خدمة الدردشة الحية غير متاحة حاليًا. يرجى استخدام أحد قنوات الدعم الأخرى.');
+        });
+        
+        // إدارة نموذج الاتصال
+        document.getElementById('supportForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('تم استلام رسالتك بنجاح! سنقوم بالرد عليك في أقرب وقت ممكن.');
+            this.reset();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+.dark-theme {
+    --light: #212529;
+    --dark: #f8f9fa;
+}
+
+.dark-theme .store-page {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+.dark-theme .glass-nav {
+    background: rgba(33, 37, 41, 0.8) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark-theme .product-card,
+.dark-theme .vulnerability-notice {
+    background-color: #2d2d2d;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme .product-desc {
+    color: #a0a0a0;
+}
+
+.dark-theme .search-bar input {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+}
+
+.dark-theme .section-header .highlight {
+    color: var(--accent);
+}
+
+.dark-theme .vulnerability-notice {
+    background-color: #332701;
+    border-left-color: #ffd351;
+}
+
+.dark-theme .notice-content h3,
+.dark-theme .notice-content p {
+    color: #ffd351;
+}

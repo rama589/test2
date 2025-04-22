@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>تسجيل الدخول - TechSecure</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-navy: #0a0f1a;
+            --navy-blue: #183b5b;
+            --steel-blue: #9bb2c3;
+            --ghost-white: #f4f6f9;
+            
+            --primary: #183b5b;
+            --primary-light: #2a567f;
+            --primary-dark: #0f2a43;
+            --secondary: #1c4b7a;
+            --accent: #3a7cb9;
+            --danger: #e63946;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-navy), var(--navy-blue));
+            color: var(--ghost-white);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+            position: relative;
+            overflow-x: hidden;
+            direction: rtl;
+            unicode-bidi: embed;
+        }
+
+        .bubbles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: rise 15s infinite ease-in;
+        }
+
+        @keyframes rise {
+            0% { bottom: -100px; transform: translateX(0); }
+            50% { transform: translateX(100px); }
+            100% { bottom: 120vh; transform: translateX(-200px); }
+        }
+
+        .bubble:nth-child(1) { width: 40px; height: 40px; left: 10%; animation-duration: 8s; }
+        .bubble:nth-child(2) { width: 20px; height: 20px; left: 20%; animation-duration: 5s; animation-delay: 1s; }
+        .bubble:nth-child(3) { width: 50px; height: 50px; left: 35%; animation-duration: 7s; animation-delay: 2s; }
+        .bubble:nth-child(4) { width: 80px; height: 80px; left: 50%; animation-duration: 11s; animation-delay: 0s; }
+        .bubble:nth-child(5) { width: 35px; height: 35px; left: 55%; animation-duration: 6s; animation-delay: 1s; }
+        .bubble:nth-child(6) { width: 45px; height: 45px; left: 65%; animation-duration: 8s; animation-delay: 3s; }
+        .bubble:nth-child(7) { width: 25px; height: 25px; left: 75%; animation-duration: 7s; animation-delay: 2s; }
+        .bubble:nth-child(8) { width: 80px; height: 80px; left: 80%; animation-duration: 6s; animation-delay: 1s; }
+
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            z-index: 2;
+            margin: 15px;
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, rgba(24, 59, 91, 0.8), rgba(10, 15, 26, 0.8));
+            color: var(--ghost-white);
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo {
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .logo img {
+            width: 40px;
+        }
+
+        .login-header h1 {
+            font-size: 1.7rem;
+            margin-bottom: 8px;
+        }
+
+        .login-header p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .login-body {
+            padding: 25px 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--dark);
+            transition: all 0.3s;
+        }
+
+        #password {
+            letter-spacing: 1px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--steel-blue);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--navy-blue);
+            font-size: 1rem;
+        }
+
+        .forgot-password {
+            text-align: left;
+            margin: -12px 0 15px;
+        }
+
+        .forgot-password a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+
+        .forgot-password a:hover {
+            color: var(--ghost-white);
+            text-decoration: underline;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(to left, var(--navy-blue), var(--primary-light));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(24, 59, 91, 0.4);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(24, 59, 91, 0.6);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .divider::before { margin-left: 10px; }
+        .divider::after { margin-right: 10px; }
+
+        .social-login {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .social-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .social-btn.google { background: linear-gradient(135deg, #EA4335, #FBBC05); }
+        .social-btn.facebook { background: linear-gradient(135deg, #1877F2, #0A58E4); }
+        .social-btn.twitter { background: linear-gradient(135deg, #1DA1F2, #0D8ECF); }
+
+        .social-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .register-link a {
+            color: var(--ghost-white);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        .forgot-password-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .forgot-password-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            width: 90%;
+            max-width: 450px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: fadeIn 0.3s ease-out;
+            color: var(--dark);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .forgot-password-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .forgot-password-header h2 {
+            color: var(--navy-blue);
+            margin-bottom: 10px;
+        }
+
+        .forgot-password-body input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .forgot-password-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .forgot-password-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-send {
+            background: var(--navy-blue);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #f0f0f0;
+            color: var(--dark);
+        }
+
+        .audio-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 15px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .audio-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--navy-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .audio-btn:hover {
+            transform: scale(1.1);
+            background: var(--primary-light);
+        }
+        
+        .audio-btn i {
+            font-size: 1.2rem;
+        }
+        
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            color: var(--dark);
+        }
+        
+        .speed-control select {
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background: white;
+        }
+
+        /* أنماط وضع المكفوفين */
+        .high-contrast {
+            --dark-navy: #000000;
+            --navy-blue: #333333;
+            --steel-blue: #666666;
+            --ghost-white: #FFFFFF;
+            
+            --primary: #000000;
+            --primary-light: #333333;
+            --primary-dark: #000000;
+            --secondary: #333333;
+            --accent: #666666;
+            --danger: #FF0000;
+            --success: #00FF00;
+            --warning: #FFFF00;
+            --light: #FFFFFF;
+            --dark: #000000;
+            --gray: #666666;
+            
+            background: #FFFFFF !important;
+            color: #000000 !important;
+        }
+
+        .high-contrast .login-container {
+            background: #FFFFFF !important;
+            border: 2px solid #000000 !important;
+            color: #000000 !important;
+        }
+
+        .high-contrast .login-header {
+            background: #000000 !important;
+            color: #FFFFFF !important;
+        }
+
+        .high-contrast .form-group input {
+            background: #FFFFFF !important;
+            border: 2px solid #000000 !important;
+            color: #000000 !important;
+        }
+
+        .high-contrast .btn-login {
+            background: #000000 !important;
+            color: #FFFFFF !important;
+            border: 2px solid #000000 !important;
+        }
+
+        .high-contrast .social-btn {
+            border: 2px solid #000000 !important;
+        }
+
+        .high-contrast .bubble {
+            background: #000000 !important;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                border-radius: 12px;
+            }
+            
+            .login-header {
+                padding: 20px 15px;
+            }
+            
+            .login-body {
+                padding: 20px 15px;
+            }
+            
+            .form-group input {
+                padding: 12px 15px 12px 40px;
+                font-size: 0.9rem;
+            }
+            
+            .input-icon {
+                left: 12px;
+                font-size: 0.9rem;
+            }
+            
+            .btn-login {
+                padding: 12px;
+                font-size: 0.95rem;
+            }
+            
+            .social-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+            }
+            
+            .audio-controls {
+                bottom: 10px;
+                left: 10px;
+                padding: 8px 12px;
+            }
+            
+            .audio-btn {
+                width: 35px;
+                height: 35px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+    
+    <div class="login-container">
+        <div class="login-header">
+            <div class="logo">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjMTgzYjViIiBkPSJNMjU2IDhDMTE5IDggOCAxMTkgOCAyNTZzMTExIDI0OCAyNDggMjQ4IDI0OC0xMTEgMjQ4LTI0OFMzOTMgOCAyNTYgOHptMCA0NDhjLTExMC41IDAtMjAwLTg5LjUtMjAwLTIwMFMxNDUuNSA1NiAyNTYgNTZzMjAwIDg5LjUgMjAwIDIwMC04OS41IDIwMC0yMDAgMjAwem02NS4yLTE0Ni43Yy0zLjEgMy4xLTguMiAzLjEtMTEuMyAwbC03MC4yLTcwLjJjLTYuMy02LjMtMTYuNC02LjMtMjIuNyAwLTYuMyA2LjMtNi4zIDE2LjQgMCAyMi43bDcwLjIgNzAuMmMuMy4zLjcuNCAxLjEuNC40IDAgLjgtLjEgMS4xLS40bDcwLjItNzAuMmM2LjMtNi4zIDYuMy0xNi40IDAtMjIuNy02LjQtNi4yLTE2LjQtNi4yLTIyLjcgMHoiLz48L3N2Zz4=" alt="TechSecure">
+            </div>
+            <h1>مرحباً بعودتك!</h1>
+            <p>سجل الدخول للوصول إلى عالم TechSecure</p>
+        </div>
+        
+        <div class="login-body">
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">اسم المستخدم أو البريد الإلكتروني</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="username" placeholder="أدخل اسم المستخدم أو البريد الإلكتروني" required>
+                        <i class="fas fa-user input-icon"></i>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">كلمة المرور</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="password" placeholder="أدخل كلمة المرور" required>
+                        <i class="fas fa-lock input-icon"></i>
+                    </div>
+                    <div class="forgot-password">
+                        <a href="#" id="forgotPasswordLink">نسيت كلمة المرور؟</a>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-login">
+                    تسجيل الدخول
+                </button>
+            </form>
+            
+            <div class="divider">أو</div>
+            
+            <div class="social-login">
+                <a href="#" class="social-btn google" title="تسجيل الدخول باستخدام Google">
+                    <i class="fab fa-google"></i>
+                </a>
+                <a href="#" class="social-btn facebook" title="تسجيل الدخول باستخدام Facebook">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="social-btn twitter" title="تسجيل الدخول باستخدام Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+            </div>
+            
+            <div class="register-link">
+                ليس لديك حساب؟ <a href="./register.html">أنشئ حساب جديد</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="forgot-password-modal" id="forgotPasswordModal">
+        <div class="forgot-password-container">
+            <div class="forgot-password-header">
+                <h2>استعادة كلمة المرور</h2>
+                <p>أدخل بريدك الإلكتروني لاستعادة كلمة المرور</p>
+            </div>
+            <div class="forgot-password-body">
+                <input type="email" id="recoveryEmail" placeholder="البريد الإلكتروني المسجل">
+            </div>
+            <div class="forgot-password-footer">
+                <button class="forgot-password-btn btn-cancel" id="cancelRecovery">إلغاء</button>
+                <button class="forgot-password-btn btn-send" id="sendRecovery">إرسال رابط الاستعادة</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="audio-controls">
+        <button class="audio-btn" id="playBtn" title="تشغيل الشرح الصوتي">
+            <i class="fas fa-play"></i>
+        </button>
+        <button class="audio-btn" id="pauseBtn" title="إيقاف الشرح الصوتي مؤقتًا">
+            <i class="fas fa-pause"></i>
+        </button>
+        <button class="audio-btn" id="stopBtn" title="إيقاف الشرح الصوتي">
+            <i class="fas fa-stop"></i>
+        </button>
+        <button class="audio-btn" id="colorBlindBtn" title="وضع المكفوفين وضعاف البصر">
+            <i class="fas fa-eye"></i>
+        </button>
+        <div class="speed-control">
+            <span>السرعة:</span>
+            <select id="speedSelect">
+                <option value="0.5">0.5x</option>
+                <option value="0.8">0.8x</option>
+                <option value="1" selected>عادي</option>
+                <option value="1.2">1.2x</option>
+                <option value="1.5">1.5x</option>
+            </select>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // منع المسافات في كلمة المرور
+            const passwordInput = document.getElementById('password');
+            passwordInput.addEventListener('keydown', function(e) {
+                if(e.key === ' ') {
+                    e.preventDefault();
+                }
+            });
+            
+            passwordInput.addEventListener('paste', function(e) {
+                const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                if(pastedText.includes(' ')) {
+                    e.preventDefault();
+                    alert('لا يمكن استخدام المسافات في كلمة المرور');
+                }
+            });
+            
+            // إدارة نافذة نسيت كلمة المرور
+            const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+            const forgotPasswordModal = document.getElementById('forgotPasswordModal');
+            const cancelRecovery = document.getElementById('cancelRecovery');
+            const sendRecovery = document.getElementById('sendRecovery');
+            
+            forgotPasswordLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                forgotPasswordModal.style.display = 'flex';
+            });
+            
+            cancelRecovery.addEventListener('click', function() {
+                forgotPasswordModal.style.display = 'none';
+            });
+            
+            sendRecovery.addEventListener('click', function() {
+                const email = document.getElementById('recoveryEmail').value;
+                if(email) {
+                    alert('تم إرسال رابط استعادة كلمة المرور إلى بريدك الإلكتروني');
+                    forgotPasswordModal.style.display = 'none';
+                } else {
+                    alert('الرجاء إدخال البريد الإلكتروني');
+                }
+            });
+            
+            forgotPasswordModal.addEventListener('click', function(e) {
+                if(e.target === forgotPasswordModal) {
+                    forgotPasswordModal.style.display = 'none';
+                }
+            });
+            
+            // نظام الشرح الصوتي
+            const speech = new SpeechSynthesisUtterance();
+            let voices = [];
+            
+            function loadVoices() {
+                voices = window.speechSynthesis.getVoices();
+                const arabicVoice = voices.find(voice => voice.lang.includes('ar') || voice.lang.includes('AR'));
+                
+                if (arabicVoice) {
+                    speech.voice = arabicVoice;
+                    speech.lang = arabicVoice.lang;
+                } else {
+                    console.warn('لم يتم العثور على صوت عربي، سيتم استخدام الصوت الافتراضي');
+                    speech.lang = 'ar-SA';
+                }
+            }
+            
+            // نص الشرح الصوتي
+            speech.text = `
+                صفحة تسجيل الدخول إلى نظام TechSecure.
+                مرحبًا بعودتك! يرجى إدخال اسم المستخدم أو البريد الإلكتروني في الحقل الأول.
+                ثم أدخل كلمة المرور في الحقل الثاني. 
+                يمكنك النقر على زر تسجيل الدخول بعد إدخال البيانات.
+               
+            `;
+            
+            // عناصر التحكم بالصوت
+            const playBtn = document.getElementById('playBtn');
+            const pauseBtn = document.getElementById('pauseBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const speedSelect = document.getElementById('speedSelect');
+            
+            // أحداث الأزرار
+            playBtn.addEventListener('click', function() {
+                window.speechSynthesis.cancel();
+                loadVoices();
+                speech.rate = parseFloat(speedSelect.value);
+                window.speechSynthesis.speak(speech);
+            });
+            
+            pauseBtn.addEventListener('click', function() {
+                window.speechSynthesis.pause();
+            });
+            
+            stopBtn.addEventListener('click', function() {
+                window.speechSynthesis.cancel();
+            });
+            
+            speedSelect.addEventListener('change', function() {
+                speech.rate = parseFloat(this.value);
+            });
+            
+            // تحميل الأصوات عند التهيئة
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+            loadVoices();
+            
+            // مقدمة صوتية تلقائية
+            setTimeout(() => {
+                const introSpeech = new SpeechSynthesisUtterance();
+                introSpeech.text = "مرحبًا بك في صفحة تسجيل الدخول. للاستماع إلى الشرح المفصل، انقر على زر التشغيل في الزاوية السفلية اليسرى من الشاشة.";
+                introSpeech.lang = 'ar-SA';
+                if (speech.voice) introSpeech.voice = speech.voice;
+                window.speechSynthesis.speak(introSpeech);
+            }, 1500);
+            
+            // دعم المكفوفين وضعاف البصر
+            const colorBlindBtn = document.getElementById('colorBlindBtn');
+            let isHighContrast = false;
+
+            colorBlindBtn.addEventListener('click', function() {
+                isHighContrast = !isHighContrast;
+                
+                if(isHighContrast) {
+                    document.body.classList.add('high-contrast');
+                    colorBlindBtn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                    colorBlindBtn.title = 'إيقاف وضع المكفوفين';
+                    
+                    // إعلام صوتي
+                    const speech = new SpeechSynthesisUtterance();
+                    speech.text = "تم تفعيل وضع المكفوفين وضعاف البصر. تم تغيير الألوان إلى تباين عالي بالأبيض والأسود.";
+                    speech.lang = 'ar-SA';
+                    window.speechSynthesis.speak(speech);
+                } else {
+                    document.body.classList.remove('high-contrast');
+                    colorBlindBtn.innerHTML = '<i class="fas fa-eye"></i>';
+                    colorBlindBtn.title = 'وضع المكفوفين وضعاف البصر';
+                    
+                    // إعلام صوتي
+                    const speech = new SpeechSynthesisUtterance();
+                    speech.text = "تم إيقاف وضع المكفوفين وضعاف البصر. تم استعادة الألوان الأصلية.";
+                    speech.lang = 'ar-SA';
+                    window.speechSynthesis.speak(speech);
+                }
+            });
+            
+            // تحسينات للأجهزة المختلفة
+            function checkDeviceSupport() {
+                if(!CSS.supports('backdrop-filter', 'blur(10px)')) {
+                    document.querySelector('.login-container').style.background = 'rgba(26, 32, 44, 0.95)';
+                }
+                
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                if(isIOS) {
+                    document.body.style.minHeight = '-webkit-fill-available';
+                }
+            }
+            
+            checkDeviceSupport();
+        });
+    </script>
+</body>
+</html>

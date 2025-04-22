@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام متابعة المحاكيات الأمنية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --dark-navy: #0a0f1a;
+            --navy-blue: #183b5b;
+            --steel-blue: #9bb2c3;
+            --ghost-white: #f4f6f9;
+            
+            --primary: #183b5b;
+            --primary-dark: #0f2a43;
+            --primary-light: #2a567f;
+            --accent: #3a7cb9;
+            --danger: #e63946;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+        }
+
+        body {
+            background-color: var(--ghost-white);
+            font-family: 'Tajawal', sans-serif;
+            color: var(--dark-navy);
+        }
+
+        .dashboard-container {
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(155, 178, 195, 0.3);
+        }
+
+        .header h1 {
+            color: var(--navy-blue);
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 0;
+        }
+
+        .header h1 i {
+            color: var(--accent);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 30px;
+        }
+
+        .simulation-list {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(10, 15, 26, 0.08);
+            padding: 25px;
+        }
+
+        .simulation-form {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(10, 15, 26, 0.08);
+            padding: 25px;
+            position: sticky;
+            top: 30px;
+            height: fit-content;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--navy-blue);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(155, 178, 195, 0.2);
+        }
+
+        .section-title i {
+            color: var(--accent);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to left, var(--primary), var(--primary-dark));
+            color: var(--ghost-white);
+            box-shadow: 0 5px 15px rgba(24, 59, 91, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(to left, var(--primary-dark), var(--primary));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(24, 59, 91, 0.3);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .search-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-control, .form-select {
+            padding: 12px 18px;
+            border-radius: 8px;
+            border: 1px solid rgba(155, 178, 195, 0.5);
+            background-color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s;
+            color: var(--navy-blue);
+        }
+
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(58, 124, 185, 0.2);
+            background-color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px 20px;
+            text-align: right;
+            border-bottom: 1px solid rgba(155, 178, 195, 0.2);
+        }
+
+        th {
+            background-color: rgba(244, 246, 249, 0.7);
+            font-weight: 600;
+            color: var(--navy-blue);
+        }
+
+        tr:hover td {
+            background-color: rgba(244, 246, 249, 0.5);
+        }
+
+        .badge {
+            padding: 7px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-primary {
+            background-color: rgba(24, 59, 91, 0.1);
+            color: var(--primary);
+        }
+
+        .badge-danger {
+            background-color: rgba(230, 57, 70, 0.1);
+            color: var(--danger);
+        }
+
+        .badge-warning {
+            background-color: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+        }
+
+        .badge-success {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--steel-blue);
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 8px;
+            border-radius: 6px;
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+
+        .action-btn:hover {
+            color: var(--accent);
+            background: rgba(58, 124, 185, 0.1);
+            transform: scale(1.1);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 8px;
+        }
+
+        .page-item {
+            list-style: none;
+        }
+
+        .page-link {
+            padding: 10px 15px;
+            border-radius: 8px;
+            color: var(--navy-blue);
+            text-decoration: none;
+            border: 1px solid rgba(155, 178, 195, 0.3);
+            transition: all 0.3s;
+        }
+
+        .page-link:hover {
+            background-color: rgba(244, 246, 249, 0.7);
+            color: var(--accent);
+        }
+
+        .page-item.active .page-link {
+            background: linear-gradient(to left, var(--primary), var(--primary-dark));
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* تأثيرات الحركة */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .simulation-list, .simulation-form {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* التكيف مع الشاشات الصغيرة */
+        @media (max-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .simulation-form {
+                position: static;
+                margin-top: 30px;
+            }
+            
+            .search-filter {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 20px;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1><i class="fas fa-shield-alt"></i> نظام متابعة المحاكيات الأمنية</h1>
+            <a href="../1.html" class="btn btn-outline">
+                <i class="fas fa-home"></i> العودة للرئيسية
+            </a>
+        </div>
+
+        <div class="main-content">
+            <div class="simulation-list">
+                <div class="section-title">
+                    <i class="fas fa-list"></i> سجل المحاكيات
+                </div>
+                
+                <div class="search-filter">
+                    <input type="text" class="form-control" placeholder="ابحث في المحاكيات...">
+                    <select class="form-select">
+                        <option>جميع الأنواع</option>
+                        <option>حقن SQL</option>
+                        <option>هجوم XSS</option>
+                        <option>هجوم DDoS</option>
+                        <option>اختبار اختراق</option>
+                    </select>
+                    <select class="form-select">
+                        <option>جميع الحالات</option>
+                        <option>قيد التنفيذ</option>
+                        <option>مكتملة</option>
+                        <option>ملغاة</option>
+                    </select>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>رقم المحاكاة</th>
+                            <th>نوع المحاكاة</th>
+                            <th>تاريخ البدء</th>
+                            <th>تاريخ الانتهاء</th>
+                            <th>الحالة</th>
+                            <th>المستخدم</th>
+                            <th>الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#SIM-2023-001</td>
+                            <td>اختبار اختراق</td>
+                            <td>2023-06-15 10:30</td>
+                            <td>2023-06-15 11:45</td>
+                            <td><span class="badge badge-success">مكتملة</span></td>
+                            <td>Rama</td>
+                            <td>
+                                <button class="action-btn" title="عرض التقرير"><i class="fas fa-file-alt"></i></button>
+                                <button class="action-btn" title="إعادة التشغيل"><i class="fas fa-redo"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#SIM-2023-002</td>
+                            <td>حقن SQL</td>
+                            <td>2023-06-14 14:15</td>
+                            <td>2023-06-14 15:30</td>
+                            <td><span class="badge badge-success">مكتملة</span></td>
+                            <td>Admin</td>
+                            <td>
+                                <button class="action-btn" title="عرض التقرير"><i class="fas fa-file-alt"></i></button>
+                                <button class="action-btn" title="إعادة التشغيل"><i class="fas fa-redo"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#SIM-2023-003</td>
+                            <td>هجوم DDoS</td>
+                            <td>2023-06-14 09:00</td>
+                            <td>-</td>
+                            <td><span class="badge badge-primary">قيد التنفيذ</span></td>
+                            <td>Rama</td>
+                            <td>
+                                <button class="action-btn" title="عرض التقرير"><i class="fas fa-file-alt"></i></button>
+                                <button class="action-btn" title="إيقاف"><i class="fas fa-stop"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#SIM-2023-004</td>
+                            <td>هجوم XSS</td>
+                            <td>2023-06-13 16:20</td>
+                            <td>2023-06-13 17:45</td>
+                            <td><span class="badge badge-danger">ملغاة</span></td>
+                            <td>TestUser</td>
+                            <td>
+                                <button class="action-btn" title="عرض التقرير"><i class="fas fa-file-alt"></i></button>
+                                <button class="action-btn" title="إعادة التشغيل"><i class="fas fa-redo"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>#SIM-2023-005</td>
+                            <td>اختبار اختراق</td>
+                            <td>2023-06-12 11:10</td>
+                            <td>2023-06-12 13:25</td>
+                            <td><span class="badge badge-success">مكتملة</span></td>
+                            <td>Admin</td>
+                            <td>
+                                <button class="action-btn" title="عرض التقرير"><i class="fas fa-file-alt"></i></button>
+                                <button class="action-btn" title="إعادة التشغيل"><i class="fas fa-redo"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <ul class="pagination">
+                    <li class="page-item"><a class="page-link" href="#">السابق</a></li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item"><a class="page-link" href="#">التالي</a></li>
+                </ul>
+            </div>
+
+            <div class="simulation-form">
+                <div class="section-title">
+                    <i class="fas fa-plus-circle"></i> إنشاء محاكاة جديدة
+                </div>
+                <form id="newSimulationForm">
+                    <div style="margin-bottom: 20px;">
+                        <label for="simulationType" style="display: block; margin-bottom: 10px; font-weight: 600; color: var(--navy-blue);">نوع المحاكاة</label>
+                        <select id="simulationType" class="form-select" style="width: 100%;">
+                            <option value="">اختر نوع المحاكاة</option>
+                            <option value="pentest">اختبار اختراق</option>
+                            <option value="sql">حقن SQL</option>
+                            <option value="xss">هجوم XSS</option>
+                            <option value="ddos">هجوم DDoS</option>
+                            <option value="brute">هجوم Brute Force</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label for="simulationTarget" style="display: block; margin-bottom: 10px; font-weight: 600; color: var(--navy-blue);">الهدف</label>
+                        <select id="simulationTarget" class="form-select" style="width: 100%;">
+                            <option value="">اختر الهدف</option>
+                            <option value="web">الموقع الإلكتروني</option>
+                            <option value="api">واجهة برمجة التطبيقات</option>
+                            <option value="server">الخادم الرئيسي</option>
+                            <option value="db">قاعدة البيانات</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom: 25px;">
+                        <label for="simulationDesc" style="display: block; margin-bottom: 10px; font-weight: 600; color: var(--navy-blue);">وصف المحاكاة</label>
+                        <textarea id="simulationDesc" class="form-control" rows="4" style="width: 100%;"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-save"></i> حفظ المحاكاة
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // هنا سيكون الكود للاتصال بقاعدة البيانات
+        document.getElementById('newSimulationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // جمع بيانات النموذج
+            const formData = {
+                type: document.getElementById('simulationType').value,
+                target: document.getElementById('simulationTarget').value,
+                description: document.getElementById('simulationDesc').value
+            };
+            
+            // هنا يمكنك إضافة كود لإرسال البيانات إلى الخادم
+            console.log('بيانات المحاكاة الجديدة:', formData);
+            
+            // إنشاء صف جديد في الجدول
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>#SIM-2023-006</td>
+                <td>${getSimulationTypeName(formData.type)}</td>
+                <td>${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}</td>
+                <td>-</td>
+                <td><span class="badge badge-primary">قيد التنفيذ</span></td>
+                <td>Admin</td>
+                <td>
+                    <button class="action-btn" title="عرض التقرير"><i class="fas fa-file-alt"></i></button>
+                    <button class="action-btn" title="إيقاف"><i class="fas fa-stop"></i></button>
+                </td>
+            `;
+            
+            // إضافة الصف الجديد في بداية الجدول
+            document.querySelector('tbody').prepend(newRow);
+            
+            // عرض رسالة نجاح
+            showAlert('success', 'تم إنشاء المحاكاة بنجاح وتمت إضافتها إلى القائمة');
+            
+            // إعادة تعيين النموذج
+            this.reset();
+        });
+
+        function getSimulationTypeName(type) {
+            const types = {
+                'pentest': 'اختبار اختراق',
+                'sql': 'حقن SQL',
+                'xss': 'هجوم XSS',
+                'ddos': 'هجوم DDoS',
+                'brute': 'هجوم Brute Force'
+            };
+            return types[type] || type;
+        }
+
+        function showAlert(type, message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} mt-3`;
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                ${message}
+            `;
+            
+            document.querySelector('.simulation-list').prepend(alertDiv);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        // إضافة تأثير hover للصفوف في الجدول
+        const tableRows = document.querySelectorAll('tbody tr');
+        tableRows.forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                row.style.transform = 'translateX(-5px)';
+                row.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+            });
+            
+            row.addEventListener('mouseleave', () => {
+                row.style.transform = 'none';
+                row.style.boxShadow = 'none';
+            });
+        });
+
+        // مثال لكود لجلب بيانات المحاكيات من قاعدة البيانات
+        async function fetchSimulations() {
+            try {
+                // هذا مثال - يجب استبداله باستدعاء API حقيقي
+                const response = await fetch('/api/simulations');
+                const data = await response.json();
+                console.log('بيانات المحاكيات:', data);
+                // هنا يمكنك إضافة كود لعرض البيانات في الجدول
+            } catch (error) {
+                console.error('حدث خطأ في جلب البيانات:', error);
+                showAlert('danger', 'حدث خطأ في جلب بيانات المحاكيات');
+            }
+        }
+
+        // جلب البيانات عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', fetchSimulations);
+    </script>
+</body>
+</html>

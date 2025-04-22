@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المزيد عن نظام محاكاة الجرائم الإلكترونية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --dark-navy: #0a0f1a;
+            --navy-blue: #183b5b;
+            --steel-blue: #9bb2c3;
+            --ghost-white: #f4f6f9;
+            --primary: #183b5b;
+            --primary-dark: #0f2a43;
+            --primary-light: #2a567f;
+            --secondary: #1c4b7a;
+            --accent: #3a7cb9;
+            --danger: #e63946;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --glass-bg: rgba(248, 249, 250, 0.95);
+            --shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: var(--ghost-white);
+            color: var(--dark-navy);
+            line-height: 1.6;
+            padding-top: 80px;
+            overflow-x: hidden;
+        }
+
+        /* نظام التحميل */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-dark);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            border: 8px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* مؤشر التقدم */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 0%;
+            height: 4px;
+            background: var(--accent);
+            z-index: 1000;
+            transition: width 0.1s ease;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        /* متابع الفأرة */
+        .cursor-follower {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(58, 124, 185, 0.3);
+            pointer-events: none;
+            z-index: 999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, background 0.3s ease;
+            mix-blend-mode: multiply;
+        }
+
+        .cursor-follower.active {
+            transform: translate(-50%, -50%) scale(2);
+            background: rgba(230, 57, 70, 0.3);
+        }
+
+        /* جسيمات الخلفية */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(58, 124, 185, 0.1);
+            border-radius: 50%;
+            animation: floatParticle linear infinite;
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(0) translateX(0); opacity: 1; }
+            100% { transform: translateY(-1000px) translateX(200px); opacity: 0; }
+        }
+
+        /* شريط التنقل */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(10, 15, 26, 0.1);
+            border-bottom: 1px solid rgba(155, 178, 195, 0.2);
+            transition: all 0.3s ease;
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+
+        .navbar.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 5px 25px rgba(10, 15, 26, 0.15);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 12px;
+        }
+
+        .logo-img {
+            height: 36px;
+            width: auto;
+            transition: transform 0.3s;
+        }
+
+        .brand-logo:hover .logo-img {
+            transform: rotate(15deg);
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--navy-blue);
+            position: relative;
+        }
+
+        .brand-name::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s;
+        }
+
+        .brand-logo:hover .brand-name::after {
+            transform: scaleX(1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 18px;
+            text-decoration: none;
+            color: var(--dark-navy);
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link i {
+            margin-left: 8px;
+            font-size: 1rem;
+            transition: transform 0.3s;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(24, 59, 91, 0.1), rgba(58, 124, 185, 0.1));
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            z-index: -1;
+        }
+
+        .nav-link:hover {
+            color: var(--navy-blue);
+        }
+
+        .nav-link:hover::before {
+            transform: translateY(0);
+        }
+
+        .nav-link:hover i {
+            transform: translateX(-3px);
+        }
+
+        .nav-link.active {
+            background: var(--navy-blue);
+            color: var(--ghost-white);
+            box-shadow: 0 5px 15px rgba(24, 59, 91, 0.2);
+        }
+
+        .nav-link.active:hover i {
+            transform: none;
+        }
+
+        /* قسم البطل المعدل */
+        .hero-section {
+            padding: 100px 0;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-align: center;
+            margin-bottom: 40px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .hero-section.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 25px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .hero-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 50%;
+            transform: translateX(50%);
+            width: 80px;
+            height: 5px;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .hero-description {
+            font-size: 1.15rem;
+            opacity: 0.9;
+            margin-bottom: 35px;
+            line-height: 1.8;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: var(--ghost-white);
+            color: var(--navy-blue);
+            border: 2px solid var(--ghost-white);
+            box-shadow: 0 5px 15px rgba(244, 246, 249, 0.2);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2));
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #f0f2f5;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(244, 246, 249, 0.3);
+        }
+
+        .btn-primary:hover::before {
+            transform: translateX(0);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--ghost-white);
+            border: 2px solid var(--ghost-white);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+        }
+
+        /* قسم الأهداف */
+        .goals-section {
+            padding: 80px 0;
+            background: white;
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .section-title.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-title h2 {
+            font-size: 2.3rem;
+            color: var(--dark-navy);
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            right: 50%;
+            transform: translateX(50%);
+            width: 100px;
+            height: 5px;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .section-title p {
+            color: var(--navy-blue);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+        }
+
+        .goal-card {
+            background: white;
+            border-radius: 15px;
+            padding: 35px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.07);
+            transition: all 0.4s ease;
+            border: 1px solid rgba(155, 178, 195, 0.2);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s ease;
+        }
+
+        .goal-card.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .goal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--accent);
+            transform: translateY(-100%);
+            transition: transform 0.3s;
+        }
+
+        .goal-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+            border-color: rgba(24, 59, 91, 0.3);
+        }
+
+        .goal-card:hover::before {
+            transform: translateY(0);
+        }
+
+        .goal-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(24, 59, 91, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            font-size: 2rem;
+            color: var(--navy-blue);
+            transition: all 0.3s;
+        }
+
+        .goal-card:hover .goal-icon {
+            background: var(--navy-blue);
+            color: var(--ghost-white);
+            transform: rotate(15deg) scale(1.1);
+        }
+
+        /* قسم المميزات */
+        .features-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, rgba(244, 246, 249, 0.9), rgba(235, 239, 244, 0.9));
+            position: relative;
+        }
+
+        .features-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .features-tabs.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            background: transparent;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--navy-blue);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 0;
+            height: 3px;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .tab-btn:hover::after {
+            width: 100%;
+        }
+
+        .tab-btn.active {
+            background: var(--navy-blue);
+            color: white;
+            box-shadow: 0 5px 15px rgba(24, 59, 91, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .feature-item {
+            display: flex;
+            gap: 20px;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+            align-items: flex-start;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s ease;
+        }
+
+        .feature-item.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feature-item:hover {
+            transform: translateY(-5px) translateY(0);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            flex-shrink: 0;
+            width: 60px;
+            height: 60px;
+            background: rgba(24, 59, 91, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--navy-blue);
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .feature-item:hover .feature-icon {
+            background: var(--navy-blue);
+            color: white;
+            transform: rotate(10deg);
+        }
+
+        .feature-content h3 {
+            color: var(--dark-navy);
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .feature-content p {
+            color: var(--navy-blue);
+            line-height: 1.8;
+        }
+
+        /* قسم التقنيات */
+        .tech-section {
+            padding: 80px 0;
+            background: white;
+            position: relative;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 40px auto 0;
+            padding: 0 25px;
+        }
+
+        .tech-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.07);
+            transition: all 0.4s ease;
+            position: relative;
+            border: 1px solid rgba(155, 178, 195, 0.2);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s ease;
+        }
+
+        .tech-card.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .tech-card:hover {
+            transform: translateY(-8px) translateY(0);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        .tech-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin: 0 auto 15px;
+            filter: grayscale(100%);
+            opacity: 0.7;
+            transition: all 0.3s;
+        }
+
+        .tech-card:hover .tech-logo {
+            filter: grayscale(0%);
+            opacity: 1;
+        }
+
+        /* قسم الفريق */
+        .team-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            position: relative;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 40px auto 0;
+            padding: 0 25px;
+        }
+
+        .team-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s ease;
+        }
+
+        .team-card.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .team-card:hover {
+            transform: translateY(-10px) translateY(0);
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .team-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            border: 3px solid white;
+            transition: all 0.3s;
+        }
+
+        .team-card:hover .team-avatar {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .team-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 5px;
+        }
+
+        .team-card p {
+            color: var(--steel-blue);
+            margin-bottom: 20px;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+        }
+
+        .social-link:hover {
+            background: white;
+            color: var(--navy-blue);
+            transform: translateY(-5px);
+        }
+
+        /* قسم الأسئلة الشائعة */
+        .faq-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, rgba(244, 246, 249, 0.9), rgba(235, 239, 244, 0.9));
+            position: relative;
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 25px;
+        }
+
+        .faq-item {
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: all 0.3s;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s ease;
+        }
+
+        .faq-item.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .faq-item:hover {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .faq-question {
+            padding: 25px;
+            font-weight: 600;
+            color: var(--dark-navy);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .faq-question:hover {
+            color: var(--primary);
+        }
+
+        .faq-question i {
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 0 25px;
+            color: var(--navy-blue);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            line-height: 1.8;
+        }
+
+        .faq-item.active .faq-answer {
+            padding-bottom: 25px;
+            max-height: 500px;
+        }
+
+        /* قسم الدعوة للعمل */
+        .cta-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s ease;
+        }
+
+        .cta-section.animate {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .cta-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .cta-description {
+            font-size: 1.15rem;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* تأثيرات موجات الخلفية */
+        .wave-bg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none"><path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" fill="%23ffffff"></path><path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" fill="%23ffffff"></path><path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" fill="%23ffffff"></path></svg>');
+            background-size: cover;
+            background-repeat: no-repeat;
+            z-index: 1;
+        }
+
+        /* تأثيرات النقر على الأزرار */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* التكيف مع الشاشات الصغيرة */
+        @media (max-width: 992px) {
+            .hero-title {
+                font-size: 2.3rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .section-title h2 {
+                font-size: 1.8rem;
+            }
+            
+            .goals-grid, .tech-grid, .team-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- شاشة التحميل -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <h2>جاري تحميل النظام...</h2>
+    </div>
+
+    <!-- مؤشر التقدم -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- متابع الفأرة -->
+    <div class="cursor-follower" id="cursorFollower"></div>
+
+    <!-- جسيمات الخلفية -->
+    <div class="particles" id="particles"></div>
+
+    <!-- شريط التنقل -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="../1.html" class="brand-logo">
+                <img src="ChatGPT Image 10 أبريل 2025، 09_30_14 ص.png" alt="Logo" class="logo-img">
+                <span class="brand-name">محاكاة الجرائم الإلكترونية</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="../store/index.html" class="nav-link">
+                    <i class="fas fa-store"></i>
+                    المتجر الإلكتروني
+                </a>
+                <a href="../admin/login.html" class="nav-link">
+                    <i class="fas fa-user-cog"></i>
+                    لوحة التحكم
+                </a>
+                <a href="../hack-tools/sqli.html" class="nav-link active">
+                    <i class="fas fa-tools"></i>
+                    أدوات تعليمية
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- قسم البطل -->
+    <section class="hero-section" id="heroSection">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <i class="fas fa-info-circle"></i> المزيد عن النظام
+                </h1>
+                <p class="hero-description">
+                    تعرف على أهداف نظام محاكاة الجرائم الإلكترونية ومميزاته الفريدة والتقنيات المستخدمة في بنائه
+                </p>
+                <div class="hero-buttons">
+                    <a href="../hack-tools/sqli.html" class="btn btn-primary" id="tryBtn">
+                        <i class="fas fa-play"></i> جرب المحاكاة الآن
+                    </a>
+                    <a href="#features" class="btn btn-outline" id="featuresBtn">
+                        <i class="fas fa-star"></i> استكشف المميزات
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="wave-bg"></div>
+    </section>
+
+    <!-- قسم الأهداف -->
+    <section class="goals-section" id="goalsSection">
+        <div class="section-title" id="goalsTitle">
+            <h2><i class="fas fa-bullseye"></i> أهداف النظام</h2>
+            <p>صمم نظام المحاكاة لتحقيق مجموعة من الأهداف التعليمية والتوعوية في مجال الأمن السيبراني</p>
+        </div>
+        
+        <div class="goals-grid">
+            <div class="goal-card" id="goal1">
+                <div class="goal-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h3>التوعية الأمنية</h3>
+                <p>رفع مستوى الوعي بمخاطر الجرائم الإلكترونية وتأثيرها على الأعمال التجارية</p>
+            </div>
+            
+            <div class="goal-card" id="goal2">
+                <div class="goal-icon">
+                    <i class="fas fa-flask"></i>
+                </div>
+                <h3>التعلم التجريبي</h3>
+                <p>توفير بيئة آمنة لتجربة الهجمات الإلكترونية وفهم آليات عملها</p>
+            </div>
+            
+            <div class="goal-card" id="goal3">
+                <div class="goal-icon">
+                    <i class="fas fa-shield-virus"></i>
+                </div>
+                <h3>تعزيز الحماية</h3>
+                <p>تعلم أفضل ممارسات الحماية والوقاية من الهجمات الإلكترونية</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم المميزات -->
+    <section class="features-section" id="features">
+        <div class="section-title" id="featuresTitle">
+            <h2><i class="fas fa-star"></i> مميزات النظام</h2>
+            <p>اكتشف المميزات الفريدة التي تجعل نظام المحاكاة أداة تعليمية فعالة</p>
+        </div>
+        
+        <div class="features-tabs" id="featuresTabs">
+            <button class="tab-btn active" data-tab="simulation">المحاكاة</button>
+            <button class="tab-btn" data-tab="education">التعليم</button>
+            <button class="tab-btn" data-tab="protection">الحماية</button>
+        </div>
+        
+        <div class="features-grid">
+            <div class="tab-content active" id="simulation-tab">
+                <div class="feature-item" id="feature1">
+                    <div class="feature-icon">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>محاكاة واقعية</h3>
+                        <p>بيئة تحاكي الهجمات الإلكترونية الحقيقية على المتاجر الإلكترونية مع إمكانية تتبع تأثير كل هجوم</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item" id="feature2">
+                    <div class="feature-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>أنواع متعددة من الهجمات</h3>
+                        <p>يشمل النظام محاكاة لهجمات SQL Injection، XSS، DDoS، Brute Force وغيرها</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item" id="feature3">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>تحليل النتائج</h3>
+                        <p>لوحات تحكم متقدمة لتحليل نتائج المحاكاة وتقييم تأثير الهجمات على أداء المتجر</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="education-tab">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>مواد تعليمية شاملة</h3>
+                        <p>دروس متكاملة تشرح كل نوع من الهجمات وآلية عمله وكيفية اكتشافه</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>تمارين عملية</h3>
+                        <p>سلسلة من التمارين والتحديات الأمنية لاختبار المهارات المكتسبة</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>شهادات إتمام</h3>
+                        <p>منح شهادات معتمدة عند إكمال المسارات التعليمية المختلفة</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="protection-tab">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>أدوات الحماية</h3>
+                        <p>مجموعة من الأدوات والتقنيات لتعلم كيفية حماية المتاجر الإلكترونية</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>قوائم مرجعية</h3>
+                        <p>قوائم مرجعية لأفضل ممارسات الأمن السيبراني للتجارة الإلكترونية</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="feature-content">
+                        <h3>نظام إنذار مبكر</h3>
+                        <p>تنبيهات فورية عند اكتشاف نقاط ضعف أو سلوكيات غير آمنة</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- قسم التقنيات -->
+    <section class="tech-section" id="techSection">
+        <div class="section-title" id="techTitle">
+            <h2><i class="fas fa-cogs"></i> التقنيات المستخدمة</h2>
+            <p>صمم النظام باستخدام أحدث التقنيات لضمان تجربة مستخدم فريدة وأداء عالي</p>
+        </div>
+        
+        <div class="tech-grid">
+            <div class="tech-card" id="tech1">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/61/HTML5_logo_and_wordmark.svg" alt="HTML5" class="tech-logo">
+                <h3>HTML5</h3>
+            </div>
+            
+            <div class="tech-card" id="tech2">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/d/d5/CSS3_logo_and_wordmark.svg" alt="CSS3" class="tech-logo">
+                <h3>CSS3</h3>
+            </div>
+            
+            <div class="tech-card" id="tech3">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/Unofficial_JavaScript_logo_2.svg" alt="JavaScript" class="tech-logo">
+                <h3>JavaScript</h3>
+            </div>
+            
+            <div class="tech-card" id="tech4">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" alt="React" class="tech-logo">
+                <h3>React</h3>
+            </div>
+            
+            <div class="tech-card" id="tech5">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/d/d9/Node.js_logo.svg" alt="Node.js" class="tech-logo">
+                <h3>Node.js</h3>
+            </div>
+            
+            <div class="tech-card" id="tech6">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/29/Postgresql_elephant.svg" alt="PostgreSQL" class="tech-logo">
+                <h3>PostgreSQL</h3>
+            </div>
+        </div>
+    </section>
+    
+    <!-- قسم الفريق -->
+    <section class="team-section" id="teamSection">
+        <div class="section-title" id="teamTitle">
+            <h2 style="color: white;"><i class="fas fa-users"></i> فريق العمل</h2>
+            <p style="color: var(--steel-blue);">خبراء في الأمن السيبراني والتعليم الإلكتروني يعملون على تطوير النظام</p>
+        </div>
+        
+        <div class="team-grid">
+            <div class="team-card" id="team1">
+                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="مدير المشروع" class="team-avatar">
+                <h3>أحمد محمد</h3>
+                <p>مدير المشروع</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-link"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+            
+            <div class="team-card" id="team2">
+                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="خبيرة أمن سيبراني" class="team-avatar">
+                <h3>سارة عبدالله</h3>
+                <p>خبيرة أمن سيبراني</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#" class="social-link"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+            
+            <div class="team-card" id="team3">
+                <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="مطور الواجهة الأمامية" class="team-avatar">
+                <h3>خالد سعيد</h3>
+                <p>مطور الواجهة الأمامية</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-codepen"></i></a>
+                    <a href="#" class="social-link"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- قسم الأسئلة الشائعة -->
+    <section class="faq-section" id="faqSection">
+        <div class="section-title" id="faqTitle">
+            <h2><i class="fas fa-question-circle"></i> الأسئلة الشائعة</h2>
+            <p>إجابات على أكثر الأسئلة شيوعًا حول نظام محاكاة الجرائم الإلكترونية</p>
+        </div>
+        
+        <div class="faq-container">
+            <div class="faq-item" id="faq1">
+                <div class="faq-question">
+                    <span>هل النظام آمن للاستخدام؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>نعم، النظام مصمم بأعلى معايير الأمان. جميع عمليات المحاكاة تتم في بيئة معزولة وآمنة لا تؤثر على أنظمة حقيقية.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" id="faq2">
+                <div class="faq-question">
+                    <span>هل يمكن استخدام النظام لأغراض غير قانونية؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>النظام مخصص لأغراض تعليمية وتوعوية فقط. أي استخدام غير قانوني يخالف شروط الاستخدام وقد يعرض المستخدم للمساءلة القانونية.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" id="faq3">
+                <div class="faq-question">
+                    <span>كيف يمكنني المساهمة في تطوير النظام؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>نرحب بمساهمات المطورين والخبراء في مجال الأمن السيبراني. يمكنك التواصل معنا عبر صفحة "اتصل بنا" أو المساهمة في المشروع المفتوح المصدر على GitHub.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item" id="faq4">
+                <div class="faq-question">
+                    <span>هل توجد شهادات معتمدة بعد إكمال المسارات التعليمية؟</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>نعم، يتم منح شهادات إتمام معتمدة من قبل المؤسسة بعد اجتياز الاختبارات النهائية لكل مسار تعليمي.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- قسم الدعوة للعمل -->
+    <section class="cta-section" id="ctaSection">
+        <div class="cta-container">
+            <h2 class="cta-title">جاهز لبدء رحلتك في تعلم الأمن السيبراني؟</h2>
+            <p class="cta-description">انضم إلى آلاف المستخدمين الذين طوروا مهاراتهم في حماية المتاجر الإلكترونية من الهجمات السيبرانية</p>
+            
+            <div class="cta-buttons">
+                <a href="../register.html" class="btn btn-primary" id="registerBtn">
+                    <i class="fas fa-user-plus"></i> إنشاء حساب جديد
+                </a>
+                <a href="../login.html" class="btn btn-outline" id="loginBtn">
+                    <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                </a>
+            </div>
+        </div>
+        <div class="wave-bg"></div>
+    </section>
+
+    <script>
+        // شاشة التحميل
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loadingScreen').style.opacity = '0';
+                setTimeout(function() {
+                    document.getElementById('loadingScreen').style.display = 'none';
+                    // بدء الرسوم المتحركة بعد التحميل
+                    startAnimations();
+                }, 500);
+            }, 1500); // وقت التحميل المحاكى
+        });
+
+        // مؤشر التقدم
+        window.addEventListener('scroll', function() {
+            const scrollProgress = document.getElementById('scrollProgress');
+            const scrollTop = document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const progress = (scrollTop / scrollHeight) * 100;
+            scrollProgress.style.width = progress + '%';
+        });
+
+        // متابع الفأرة
+        const cursorFollower = document.getElementById('cursorFollower');
+        document.addEventListener('mousemove', function(e) {
+            cursorFollower.style.left = e.clientX + 'px';
+            cursorFollower.style.top = e.clientY + 'px';
+        });
+
+        // تفعيل تأثير الفأرة على العناصر التفاعلية
+        const interactiveElements = document.querySelectorAll('a, button, .goal-card, .feature-item, .tech-card, .team-card, .faq-item');
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursorFollower.classList.add('active');
+            });
+            el.addEventListener('mouseleave', () => {
+                cursorFollower.classList.remove('active');
+            });
+        });
+
+        // جسيمات الخلفية
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = window.innerWidth < 768 ? 30 : 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // أحجام عشوائية
+                const size = Math.random() * 15 + 5;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // مواقع عشوائية
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.bottom = `-${size}px`;
+                
+                // تأخيرات عشوائية
+                const delay = Math.random() * 10;
+                const duration = Math.random() * 20 + 10;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // تأثيرات النقر على الأزرار
+        function addRippleEffect(button) {
+            button.addEventListener('click', function(e) {
+                const rect = button.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        }
+
+        // تبديل علامات التبويب
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // إزالة النشاط من جميع الأزرار
+                tabBtns.forEach(b => b.classList.remove('active'));
+                // إضافة النشاط للزر المحدد
+                btn.classList.add('active');
+                
+                // إخفاء جميع المحتويات
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // إظهار المحتوى المحدد
+                const tabId = btn.getAttribute('data-tab') + '-tab';
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // الأسئلة الشائعة
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        faqQuestions.forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                item.classList.toggle('active');
+                
+                // إغلاق الأسئلة الأخرى عند فتح سؤال جديد
+                if (item.classList.contains('active')) {
+                    faqQuestions.forEach(q => {
+                        if (q.parentElement !== item) {
+                            q.parentElement.classList.remove('active');
+                        }
+                    });
+                }
+            });
+        });
+
+        // شريط التنقل
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // بدء الرسوم المتحركة
+        function startAnimations() {
+            // إظهار شريط التنقل
+            document.getElementById('navbar').classList.add('visible');
+            
+            // إظهار الأقسام مع تأثيرات متتالية
+            document.getElementById('heroSection').classList.add('animate');
+            
+            setTimeout(() => {
+                document.getElementById('goalsTitle').classList.add('animate');
+                
+                setTimeout(() => {
+                    document.getElementById('goal1').classList.add('animate');
+                    
+                    setTimeout(() => {
+                        document.getElementById('goal2').classList.add('animate');
+                        
+                        setTimeout(() => {
+                            document.getElementById('goal3').classList.add('animate');
+                            
+                            setTimeout(() => {
+                                document.getElementById('featuresTitle').classList.add('animate');
+                                document.getElementById('featuresTabs').classList.add('animate');
+                                
+                                setTimeout(() => {
+                                    document.getElementById('feature1').classList.add('animate');
+                                    
+                                    setTimeout(() => {
+                                        document.getElementById('feature2').classList.add('animate');
+                                        
+                                        setTimeout(() => {
+                                            document.getElementById('feature3').classList.add('animate');
+                                            
+                                            setTimeout(() => {
+                                                document.getElementById('techTitle').classList.add('animate');
+                                                
+                                                setTimeout(() => {
+                                                    document.getElementById('tech1').classList.add('animate');
+                                                    
+                                                    setTimeout(() => {
+                                                        document.getElementById('tech2').classList.add('animate');
+                                                        
+                                                        setTimeout(() => {
+                                                            document.getElementById('tech3').classList.add('animate');
+                                                            
+                                                            setTimeout(() => {
+                                                                document.getElementById('tech4').classList.add('animate');
+                                                                
+                                                                setTimeout(() => {
+                                                                    document.getElementById('tech5').classList.add('animate');
+                                                                    
+                                                                    setTimeout(() => {
+                                                                        document.getElementById('tech6').classList.add('animate');
+                                                                        
+                                                                        setTimeout(() => {
+                                                                            document.getElementById('teamTitle').classList.add('animate');
+                                                                            
+                                                                            setTimeout(() => {
+                                                                                document.getElementById('team1').classList.add('animate');
+                                                                                
+                                                                                setTimeout(() => {
+                                                                                    document.getElementById('team2').classList.add('animate');
+                                                                                    
+                                                                                    setTimeout(() => {
+                                                                                        document.getElementById('team3').classList.add('animate');
+                                                                                        
+                                                                                        setTimeout(() => {
+                                                                                            document.getElementById('faqTitle').classList.add('animate');
+                                                                                            
+                                                                                            setTimeout(() => {
+                                                                                                document.getElementById('faq1').classList.add('animate');
+                                                                                                
+                                                                                                setTimeout(() => {
+                                                                                                    document.getElementById('faq2').classList.add('animate');
+                                                                                                    
+                                                                                                    setTimeout(() => {
+                                                                                                        document.getElementById('faq3').classList.add('animate');
+                                                                                                        
+                                                                                                        setTimeout(() => {
+                                                                                                            document.getElementById('faq4').classList.add('animate');
+                                                                                                            
+                                                                                                            setTimeout(() => {
+                                                                                                                document.getElementById('ctaSection').classList.add('animate');
+                                                                                                            }, 200);
+                                                                                                        }, 200);
+                                                                                                    }, 200);
+                                                                                                }, 200);
+                                                                                            }, 200);
+                                                                                        }, 200);
+                                                                                    }, 200);
+                                                                                }, 200);
+                                                                            }, 200);
+                                                                        }, 200);
+                                                                    }, 200);
+                                                                }, 200);
+                                                            }, 200);
+                                                        }, 200);
+                                                    }, 200);
+                                                }, 200);
+                                            }, 200);
+                                        }, 200);
+                                    }, 200);
+                                }, 200);
+                            }, 200);
+                        }, 200);
+                    }, 200);
+                }, 200);
+            }, 200);
+            
+            // إنشاء الجسيمات
+            createParticles();
+            
+            // إضافة تأثير التموج للأزرار
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(btn => {
+                addRippleEffect(btn);
+            });
+        }
+
+        // التمرير السلس للروابط الداخلية
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

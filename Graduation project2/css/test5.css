@@ -1,0 +1,319 @@
+:root {
+    /* الألوان الأساسية */
+    --dark-navy: #0a0f1a;
+    --navy-blue: #183b5b;
+    --steel-blue: #9bb2c3;
+    --ghost-white: #f4f6f9;
+    
+    /* الألوان الثانوية */
+    --primary-color: var(--navy-blue);
+    --secondary-color: var(--dark-navy);
+    --accent-color: #3a86ff;
+    --danger-color: #ff3860;
+    --success-color: #2ecc71;
+    --warning-color: #ff9f1c;
+    
+    /* ألوان النص */
+    --text-primary: var(--dark-navy);
+    --text-secondary: var(--navy-blue);
+    --text-light: var(--ghost-white);
+    --text-muted: #6c757d;
+    
+    /* ألوان الخلفيات */
+    --bg-primary: var(--ghost-white);
+    --bg-secondary: #ffffff;
+    --bg-dark: var(--dark-navy);
+    --bg-light: #f8f9fa;
+    
+    /* ألوان الحدود */
+    --border-color: #dee2e6;
+    --border-light: #e9ecef;
+    --border-dark: #ced4da;
+    
+    /* تأثيرات الظل */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+    
+    /* ألوان التفاعل */
+    --hover-primary: #1565c0;
+    --hover-secondary: #0a192f;
+    --hover-accent: #2979ff;
+    
+    /* ألوان الأزرار */
+    --btn-primary-bg: var(--navy-blue);
+    --btn-primary-text: var(--ghost-white);
+    --btn-primary-hover: var(--dark-navy);
+    
+    --btn-secondary-bg: var(--steel-blue);
+    --btn-secondary-text: var(--dark-navy);
+    --btn-secondary-hover: #7d99b3;
+    
+    /* ألوان التنبيهات */
+    --alert-success-bg: #d4edda;
+    --alert-success-text: #155724;
+    --alert-danger-bg: #f8d7da;
+    --alert-danger-text: #721c24;
+    --alert-warning-bg: #fff3cd;
+    --alert-warning-text: #856404;
+    --alert-info-bg: #d1ecf1;
+    --alert-info-text: #0c5460;
+    
+    /* ألوان القوائم */
+    --nav-bg: var(--dark-navy);
+    --nav-text: var(--ghost-white);
+    --nav-hover: rgba(255, 255, 255, 0.1);
+    
+    /* ألوان الكروت */
+    --card-bg: var(--bg-secondary);
+    --card-shadow: var(--shadow-sm);
+    --card-hover-shadow: var(--shadow-md);
+    
+    /* ألوان النمط الداكن */
+    --dark-bg-primary: #121212;
+    --dark-bg-secondary: #1e1e1e;
+    --dark-text-primary: #e0e0e0;
+    --dark-text-secondary: #b0b0b0;
+    --dark-border-color: #333333;
+  }
+  
+  /* أنماط عامة */
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: 'Tajawal', 'Almarai', sans-serif;
+  }
+  
+  /* أنماط الروابط */
+  a {
+    color: var(--primary-color);
+    transition: color 0.3s ease;
+  }
+  
+  a:hover {
+    color: var(--hover-primary);
+    text-decoration: none;
+  }
+  
+  /* أنماط الأزرار */
+  .btn-primary {
+    background-color: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background-color: var(--btn-primary-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .btn-secondary {
+    background-color: var(--btn-secondary-bg);
+    color: var(--btn-secondary-text);
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-secondary:hover {
+    background-color: var(--btn-secondary-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  /* أنماط التنبيهات */
+  .alert {
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+  }
+  
+  .alert-success {
+    background-color: var(--alert-success-bg);
+    color: var(--alert-success-text);
+    border-left: 4px solid var(--success-color);
+  }
+  
+  .alert-danger {
+    background-color: var(--alert-danger-bg);
+    color: var(--alert-danger-text);
+    border-left: 4px solid var(--danger-color);
+  }
+  
+  /* أنماط شريط التنقل */
+  .navbar {
+    background-color: var(--nav-bg);
+    color: var(--nav-text);
+    padding: 1rem 2rem;
+    box-shadow: var(--shadow-md);
+  }
+  
+  .nav-link {
+    color: var(--nav-text);
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .nav-link:hover {
+    background-color: var(--nav-hover);
+    border-radius: 4px;
+  }
+  
+  /* أنماط بطاقات المنتجات */
+  .product-card {
+    background-color: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--card-hover-shadow);
+  }
+  
+  .product-badge {
+    background-color: var(--accent-color);
+    color: var(--ghost-white);
+    padding: 0.25rem 0.75rem;
+    border-radius: 0 0 4px 4px;
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    right: 1rem;
+  }
+  
+  /* أنماط الأقسام */
+  .section-header {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  /* أنماط النمط الداكن */
+  .dark-mode {
+    background-color: var(--dark-bg-primary);
+    color: var(--dark-text-primary);
+  }
+  
+  .dark-mode .navbar {
+    background-color: var(--dark-bg-secondary);
+  }
+  
+  .dark-mode .product-card {
+    background-color: var(--dark-bg-secondary);
+    border: 1px solid var(--dark-border-color);
+  }
+  
+  /* تأثيرات الحركة */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .animated {
+    animation: fadeIn 0.5s ease forwards;
+  }
+  
+  /* أنماط الاستجابة */
+  @media (max-width: 768px) {
+    :root {
+      --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .navbar {
+      padding: 0.75rem 1rem;
+    }
+    
+    .product-card {
+      margin-bottom: 1.5rem;
+    }
+  }
+  
+  /* أنماط خاصة بالمحاكاة الأمنية */
+  .security-meter {
+    height: 8px;
+    border-radius: 4px;
+    background-color: var(--steel-blue);
+    overflow: hidden;
+  }
+  
+  .meter-fill {
+    height: 100%;
+    background-color: var(--accent-color);
+    transition: width 0.5s ease;
+  }
+  
+  .vulnerability-point {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background-color: var(--danger-color);
+    border-radius: 50%;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+  }
+  
+  .vulnerability-point::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background-color: rgba(255, 56, 96, 0.3);
+    border-radius: 50%;
+    top: -4px;
+    left: -4px;
+    animation: pulse 2s infinite;
+  }
+  
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+  }
+  
+  /* أنماط محاكاة الهجمات */
+  .simulation-tab {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .code-block {
+    background-color: var(--dark-navy);
+    color: var(--steel-blue);
+    padding: 1rem;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    overflow-x: auto;
+  }
+  
+  .vulnerable-code {
+    color: var(--danger-color);
+    font-weight: bold;
+  }
+  
+  /* أنماط التحميل */
+  .loading-spinner {
+    border: 4px solid var(--steel-blue);
+    border-top: 4px solid var(--accent-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 2rem auto;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }

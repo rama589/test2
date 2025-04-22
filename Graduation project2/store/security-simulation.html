@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام حماية المتجر الإلكتروني</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-navy: #0a0f1a;
+            --navy-blue: #183b5b;
+            --steel-blue: #9bb2c3;
+            --ghost-white: #f4f6f9;
+            
+            --primary: #183b5b;
+            --primary-dark: #0f2a43;
+            --primary-light: #2a567f;
+            --secondary: #1c4b7a;
+            --accent: #3a7cb9;
+            --danger: #e63946;
+            --success: #4cc9f0;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --glass-bg: rgba(248, 249, 250, 0.95);
+            --shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: var(--ghost-white);
+            color: var(--dark-navy);
+            line-height: 1.6;
+            padding-top: 80px;
+            overflow-x: hidden;
+        }
+
+        /* شريط التحميل المتطور */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--dark-navy);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-content {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .loading-logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 30px;
+            animation: logoFloat 3s ease-in-out infinite;
+        }
+
+        .loading-progress-container {
+            width: 300px;
+            max-width: 80%;
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .loading-progress-bar {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            border-radius: 5px;
+            transition: width 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading-progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                            transparent, 
+                            rgba(255, 255, 255, 0.4), 
+                            transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        .loading-text {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .loading-percentage {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .loading-details {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-top: 20px;
+            min-height: 20px;
+        }
+
+        .loading-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .loading-particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            animation: floatParticle linear infinite;
+        }
+
+        /* شريط التنقل */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(10, 15, 26, 0.1);
+            border-bottom: 1px solid rgba(155, 178, 195, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 5px 25px rgba(10, 15, 26, 0.15);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            gap: 12px;
+        }
+
+        .logo-img {
+            height: 36px;
+            width: auto;
+            transition: transform 0.3s;
+        }
+
+        .brand-logo:hover .logo-img {
+            transform: rotate(15deg);
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--navy-blue);
+            position: relative;
+        }
+
+        .brand-name::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s;
+        }
+
+        .brand-logo:hover .brand-name::after {
+            transform: scaleX(1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 18px;
+            text-decoration: none;
+            color: var(--dark-navy);
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link i {
+            margin-left: 8px;
+            font-size: 1rem;
+            transition: transform 0.3s;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(24, 59, 91, 0.1), rgba(58, 124, 185, 0.1));
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            z-index: -1;
+        }
+
+        .nav-link:hover {
+            color: var(--navy-blue);
+        }
+
+        .nav-link:hover::before {
+            transform: translateY(0);
+        }
+
+        .nav-link:hover i {
+            transform: translateX(-3px);
+        }
+
+        .nav-link.active {
+            background: var(--navy-blue);
+            color: var(--ghost-white);
+            box-shadow: 0 5px 15px rgba(24, 59, 91, 0.2);
+        }
+
+        .nav-link.active:hover i {
+            transform: none;
+        }
+
+        /* قسم البطل */
+        .hero-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(58,124,185,0.1) 0%, rgba(255,255,255,0) 70%);
+            animation: pulse 15s infinite alternate;
+            z-index: 1;
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            transform: translateY(30px);
+            opacity: 0;
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .hero-description {
+            font-size: 1.15rem;
+            opacity: 0.9;
+            margin-bottom: 35px;
+            line-height: 1.8;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.3s forwards;
+        }
+
+        /* قسم حماية المتجر */
+        .protection-section {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease 0.6s forwards;
+        }
+
+        .section-title h2 {
+            font-size: 2.3rem;
+            color: var(--dark-navy);
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title h2::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            right: 50%;
+            transform: translateX(50%);
+            width: 100px;
+            height: 5px;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .protection-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease 0.9s forwards;
+        }
+
+        .protection-icon {
+            width: 120px;
+            height: 120px;
+            background: rgba(24, 59, 91, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 3rem;
+            color: var(--navy-blue);
+            transition: all 0.3s;
+            transform: scale(0);
+            animation: scaleIn 0.8s ease 1.2s forwards;
+        }
+
+        .protection-content p {
+            color: var(--navy-blue);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            font-size: 1.1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.8s ease 1.5s forwards;
+        }
+
+        .btn-primary {
+            background: var(--navy-blue);
+            color: var(--ghost-white);
+            border: 2px solid var(--navy-blue);
+            box-shadow: 0 5px 15px rgba(24, 59, 91, 0.2);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.2));
+            transform: translateX(-100%);
+            transition: transform 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(24, 59, 91, 0.3);
+        }
+
+        .btn-primary:hover::before {
+            transform: translateX(0);
+        }
+
+        /* تأثيرات الحماية */
+        .protection-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(24, 59, 91, 0.9);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .protection-animation i {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            animation: pulse 1s ease infinite;
+        }
+
+        .protection-animation p {
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .protection-progress {
+            width: 80%;
+            max-width: 400px;
+            height: 10px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 5px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+
+        .protection-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: white;
+            animation: hackProgress 2s linear forwards;
+        }
+
+        /* التذييل */
+        footer {
+            background: var(--dark-navy);
+            color: var(--ghost-white);
+            padding: 80px 0 40px;
+            position: relative;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 50px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 12px;
+        }
+
+        .footer-logo img {
+            height: 35px;
+            transition: transform 0.3s;
+        }
+
+        .footer-logo:hover img {
+            transform: rotate(15deg);
+        }
+
+        .footer-logo span {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--ghost-white);
+            position: relative;
+        }
+
+        .footer-logo span::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s;
+        }
+
+        .footer-logo:hover span::after {
+            transform: scaleX(1);
+        }
+
+        .footer-about p {
+            color: var(--steel-blue);
+            line-height: 1.8;
+            margin-bottom: 25px;
+            font-size: 1.05rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-link {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(155, 178, 195, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--ghost-white);
+            transition: all 0.3s;
+            font-size: 1.2rem;
+        }
+
+        .social-link:hover {
+            background: var(--navy-blue);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(24, 59, 91, 0.3);
+        }
+
+        .footer-links h3 {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-links h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 15px;
+        }
+
+        .footer-links a {
+            color: var(--steel-blue);
+            text-decoration: none;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            position: relative;
+        }
+
+        .footer-links a::before {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            right: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--ghost-white);
+            padding-right: 10px;
+        }
+
+        .footer-links a:hover::before {
+            width: 100%;
+        }
+
+        .footer-links a i {
+            font-size: 0.9rem;
+            transition: transform 0.3s;
+        }
+
+        .footer-links a:hover i {
+            transform: translateX(-5px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 40px;
+            margin-top: 50px;
+            border-top: 1px solid rgba(155, 178, 195, 0.3);
+            color: var(--steel-blue);
+            font-size: 0.95rem;
+        }
+
+        /* تأثيرات الحركة */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { 
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from { 
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.7; }
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translateY(0) translateX(0); opacity: 1; }
+            100% { transform: translateY(-1000px) translateX(200px); opacity: 0; }
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        @keyframes hackProgress {
+            0% { width: 0%; }
+            20% { width: 25%; }
+            40% { width: 50%; }
+            60% { width: 75%; }
+            80% { width: 90%; }
+            100% { width: 100%; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; visibility: hidden; }
+        }
+
+        /* التكيف مع الشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .section-title h2 {
+                font-size: 2rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .loading-logo {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .loading-text {
+                font-size: 1.1rem;
+            }
+            
+            .loading-percentage {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- شريط التحميل المتطور -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-particles" id="loadingParticles"></div>
+        <div class="loading-content">
+            <img src="../ChatGPT Image 10 أبريل 2025، 09_30_14 ص.png" alt="Loading Logo" class="loading-logo">
+            <h2 class="loading-text">جاري تحميل نظام الحماية</h2>
+            <div class="loading-percentage" id="loadingPercentage">0%</div>
+            <div class="loading-progress-container">
+                <div class="loading-progress-bar" id="loadingProgressBar"></div>
+            </div>
+            <div class="loading-details" id="loadingDetails">جاري تهيئة النظام...</div>
+        </div>
+    </div>
+
+    <!-- شريط التنقل -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="brand-logo">
+                <img src="../ChatGPT Image 10 أبريل 2025، 09_30_14 ص.png" alt="Logo" class="logo-img">
+                <span class="brand-name">محاكاة الجرائم الإلكترونية</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="../index.html" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    الرئيسية
+                </a>
+                <a href="../store/index.html" class="nav-link">
+                    <i class="fas fa-store"></i>
+                    المتجر الإلكتروني
+                </a>
+                <a href="../hack-tools/sqli.html" class="nav-link">
+                    <i class="fas fa-tools"></i>
+                    أدوات تعليمية
+                </a>
+                <a href="#" class="nav-link active">
+                    <i class="fas fa-shield-alt"></i>
+                    نظام الحماية
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- قسم البطل -->
+    <section class="hero-section">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">نظام حماية المتجر الإلكتروني</h1>
+                <p class="hero-description">
+                    تفعيل نظام الحماية سيؤدي إلى إصلاح جميع الثغرات الأمنية في المتجر وإخفاء نقاط الضعف
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم حماية المتجر -->
+    <section class="protection-section">
+        <div class="section-title">
+            <h2>تفعيل نظام الحماية</h2>
+        </div>
+        
+        <div class="protection-content">
+            <div class="protection-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            
+            <p>
+                نظام الحماية المتقدم سيقوم بإصلاح جميع الثغرات الأمنية في المتجر بما في ذلك:
+                ثغرات SQL Injection، XSS، CSRF، IDOR وغيرها من نقاط الضعف الشائعة.
+            </p>
+            
+            <a href="../store/index.html?protected=true" class="btn btn-primary" id="activateProtection">
+                <i class="fas fa-lock"></i> تفعيل الحماية والعودة للمتجر
+            </a>
+        </div>
+    </section>
+    
+    <!-- التذييل -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-about">
+                <div class="footer-logo">
+                    <img src="../ChatGPT Image 10 أبريل 2025، 09_30_14 ص.png" alt="Logo">
+                    <span>محاكاة الجرائم الإلكترونية</span>
+                </div>
+                <p>
+                    منصة تعليمية تهدف إلى رفع الوعي الأمني في مجال التجارة الإلكترونية
+                    من خلال توفير بيئة محاكاة آمنة لدراسة الهجمات الإلكترونية وتأثيرها
+                </p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                    <a href="#" class="social-link"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-links">
+                <h3>روابط سريعة</h3>
+                <ul>
+                    <li><a href="../index.html"><i class="fas fa-chevron-left"></i> الصفحة الرئيسية</a></li>
+                    <li><a href="../store/index.html"><i class="fas fa-chevron-left"></i> المتجر الإلكتروني</a></li>
+                    <li><a href="../hack-tools/sqli.html"><i class="fas fa-chevron-left"></i> الأدوات التعليمية</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> نظام الحماية</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h3>موارد تعليمية</h3>
+                <ul>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> وثائق النظام</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> دراسات حالة</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> مقالات أمنية</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-left"></i> الأسئلة الشائعة</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>© 2025 نظام محاكاة الجرائم الإلكترونية. جميع الحقوق محفوظة. هذا الموقع لأغراض تعليمية فقط.</p>
+        </div>
+    </footer>
+
+    <script>
+        // شريط التحميل المتطور
+        document.addEventListener('DOMContentLoaded', function() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const loadingProgressBar = document.getElementById('loadingProgressBar');
+            const loadingPercentage = document.getElementById('loadingPercentage');
+            const loadingDetails = document.getElementById('loadingDetails');
+            const loadingParticles = document.getElementById('loadingParticles');
+            
+            // إنشاء جسيمات التحميل
+            function createLoadingParticles() {
+                const particleCount = 15;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('loading-particle');
+                    
+                    // أحجام عشوائية
+                    const size = Math.random() * 8 + 3;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    
+                    // مواقع عشوائية
+                    particle.style.left = `${Math.random() * 100}%`;
+                    particle.style.top = `${Math.random() * 100}%`;
+                    
+                    // تأخيرات عشوائية
+                    const delay = Math.random() * 5;
+                    const duration = Math.random() * 15 + 10;
+                    particle.style.animationDelay = `${delay}s`;
+                    particle.style.animationDuration = `${duration}s`;
+                    
+                    loadingParticles.appendChild(particle);
+                }
+            }
+            
+            // محاكاة عملية التحميل
+            function simulateLoading() {
+                let progress = 0;
+                const loadingMessages = [
+                    "جاري تحميل المكونات الأساسية...",
+                    "تهيئة واجهة المستخدم...",
+                    "تحميل أدوات الحماية...",
+                    "إعداد نظام الحماية...",
+                    "جاري التحقق من النظام...",
+                    "التهيئة النهائية..."
+                ];
+                
+                createLoadingParticles();
+                
+                const interval = setInterval(() => {
+                    // زيادة عشوائية في التقدم
+                    progress += Math.random() * 10;
+                    if (progress > 100) progress = 100;
+                    
+                    loadingProgressBar.style.width = progress + '%';
+                    loadingPercentage.textContent = Math.floor(progress) + '%';
+                    
+                    // تغيير الرسالة بناءً على التقدم
+                    if (progress < 20) {
+                        loadingDetails.textContent = loadingMessages[0];
+                    } else if (progress < 40) {
+                        loadingDetails.textContent = loadingMessages[1];
+                    } else if (progress < 60) {
+                        loadingDetails.textContent = loadingMessages[2];
+                    } else if (progress < 75) {
+                        loadingDetails.textContent = loadingMessages[3];
+                    } else if (progress < 90) {
+                        loadingDetails.textContent = loadingMessages[4];
+                    } else {
+                        loadingDetails.textContent = loadingMessages[5];
+                    }
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        loadingScreen.classList.add('hidden');
+                        
+                        // إزالة شريط التحميل من DOM بعد انتهاء الانتقال
+                        setTimeout(() => {
+                            loadingScreen.style.display = 'none';
+                        }, 800);
+                    }
+                }, 200);
+            }
+            
+            // بدء عملية التحميل
+            simulateLoading();
+            
+            // تأثير التمرير للشريط العلوي
+            window.addEventListener('scroll', function() {
+                const navbar = document.querySelector('.navbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('scrolled');
+                } else {
+                    navbar.classList.remove('scrolled');
+                }
+            });
+      
+            // حفظ حالة الحماية في localStorage مع تأثيرات
+            document.getElementById('activateProtection').addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // إنشاء عنصر الرسوم المتحركة
+                const protectionAnimation = document.createElement('div');
+                protectionAnimation.className = 'protection-animation';
+                protectionAnimation.innerHTML = `
+                    <i class="fas fa-shield-alt"></i>
+                    <p>جاري تفعيل نظام الحماية...</p>
+                    <div class="protection-progress">
+                        <div class="protection-progress-bar"></div>
+                    </div>
+                `;
+                
+                document.body.appendChild(protectionAnimation);
+                
+                // بعد انتهاء الرسوم المتحركة
+                setTimeout(() => {
+                    // حفظ حالة الحماية
+                    localStorage.setItem('storeProtected', 'true');
+                    
+                    // إزالة الرسوم المتحركة
+                    protectionAnimation.style.animation = 'fadeOut 0.5s ease forwards';
+                    
+                    // الانتقال إلى صفحة المتجر بعد انتهاء الرسوم المتحركة
+                    setTimeout(() => {
+                        window.location.href = '../store/index.html?protected=true';
+                    }, 500);
+                    
+                }, 2000); // مدة الرسوم المتحركة (2 ثانية)
+            });
+        });
+
+        document.getElementById('activateProtection').addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // 1. تعطيل الزر أثناء التفعيل لمنع النقر المتكرر
+    const btn = this;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التفعيل...';
+    
+    // 2. إنشاء وتنسيق رسوم متحركة للحماية
+    const protectionAnimation = document.createElement('div');
+    protectionAnimation.className = 'protection-animation';
+    protectionAnimation.innerHTML = `
+        <i class="fas fa-shield-alt"></i>
+        <p>جاري إصلاح الثغرات الأمنية...</p>
+        <div class="protection-progress">
+            <div class="protection-progress-bar"></div>
+        </div>
+    `;
+    document.body.appendChild(protectionAnimation);
+    
+    // 3. محاكاة عملية الإصلاح
+    setTimeout(() => {
+        // أ. حفظ حالة الحماية في localStorage
+        localStorage.setItem('storeProtected', 'true');
+        
+        // ب. إرسال حدث إلى جميع النوافذ/الألسنة المفتوحة
+        if (typeof BroadcastChannel !== 'undefined') {
+            const channel = new BroadcastChannel('protection_channel');
+            channel.postMessage({ protected: true });
+        }
+        
+        // ج. الانتقال إلى صفحة المتجر مع إضافة timestamp لمنع التخزين المؤقت
+        setTimeout(() => {
+            protectionAnimation.style.opacity = '0';
+            setTimeout(() => {
+                window.location.href = '../store/index.html?protected=true&t=' + Date.now();
+            }, 500);
+        }, 1000);
+    }, 2000);
+});
+
+document.getElementById('activateProtection').addEventListener('click', function(e) {
+    e.preventDefault();
+    
+    // 1. تغيير مظهر الزر أثناء التفعيل
+    const btn = this;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التفعيل...';
+    btn.style.opacity = '0.7';
+    btn.style.cursor = 'not-allowed';
+    
+    // 2. عرض رسوم متحركة للحماية
+    const protectionAnimation = document.createElement('div');
+    protectionAnimation.className = 'protection-animation';
+    protectionAnimation.innerHTML = `
+        <div style="text-align: center;">
+            <i class="fas fa-shield-alt" style="font-size: 5rem; margin-bottom: 20px;"></i>
+            <h2 style="margin-bottom: 20px;">جاري تفعيل نظام الحماية</h2>
+            <div style="width: 80%; max-width: 400px; height: 10px; background: rgba(255,255,255,0.3); border-radius: 5px; margin: 0 auto;">
+                <div id="protectionBar" style="height: 100%; width: 0%; background: white; border-radius: 5px;"></div>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(protectionAnimation);
+    
+    // 3. محاكاة شريط التقدم
+    let progress = 0;
+    const progressBar = document.getElementById('protectionBar');
+    const progressInterval = setInterval(() => {
+        progress += 5;
+        progressBar.style.width = progress + '%';
+        
+        if (progress >= 100) {
+            clearInterval(progressInterval);
+            
+            // 4. بعد اكتمال التفعيل
+            setTimeout(() => {
+                // حفظ حالة الحماية
+                localStorage.setItem('storeProtected', 'true');
+                
+                // الانتقال إلى صفحة المتجر مع منع التخزين المؤقت
+                window.location.href = '../store/index.html?protected=' + Date.now();
+            }, 500);
+        }
+    }, 100);
+});
+    </script>
+</body>
+</html>

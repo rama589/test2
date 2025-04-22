@@ -1,0 +1,54 @@
+@font-face {
+    font-family: 'Tajawal';
+    src: url('../fonts/Tajawal-Regular.woff2') format('woff2'),
+         url('../fonts/Tajawal-Regular.woff') format('woff');
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Tajawal';
+    src: url('../fonts/Tajawal-Bold.woff2') format('woff2'),
+         url('../fonts/Tajawal-Bold.woff') format('woff');
+    font-weight: 700;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Almarai';
+    src: url('../fonts/Almarai-Regular.woff2') format('woff2'),
+         url('../fonts/Almarai-Regular.woff') format('woff');
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Almarai';
+    src: url('../fonts/Almarai-Bold.woff2') format('woff2'),
+         url('../fonts/Almarai-Bold.woff') format('woff');
+    font-weight: 700;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Tajawal';
+    src: url('../fonts/Tajawal-Regular.woff2') format('woff2'),
+         url('../fonts/Tajawal-Regular.woff') format('woff');
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Tajawal';
+    src: url('../fonts/Tajawal-Bold.woff2') format('woff2'),
+         url('../fonts/Tajawal-Bold.woff') format('woff');
+    font-weight: 700;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Almarai';
+    src: url('../fonts/Almarai-Regular.woff2') format('woff2'),
+         url('../fonts/Almarai-Regular.woff') format('woff');
+    font-weight: 400;
+    font-display: swap;
+}
